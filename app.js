@@ -1,39 +1,52 @@
 const express = require('express');
-
 const path = require('path');
-require('dotenv').config();
-const PORT = process.env.PORT ;
+const dotenv = require('dotenv');
 
+dotenv.config();
 
-//const corsMiddleware = require('./src/middleware/cors');
-//const sessionMiddleware = require('./src/middleware/session');
-
-const productsRoutes = require('./src/routes/products');
-const categoriesRoutes = require('./src/routes/categories');
-const authRoutes = require('./src/routes/auth');
 const app = express();
-//app.use(corsMiddleware);
+const PORT = process.env.PORT || 3000;
+
+const { applyCors } = require('./src/middlewares/cors');
+const { applySession } = require('./src/middlewares/session');
+const { applySanitizer } = require('./src/middlewares/sanitizer');
+
+const authRoutes = require('./src/routes/auth');
+const productoRoutes = require('./src/routes/productos');
+const categoriaRoutes = require('./src/routes/categorias');
+const clienteRoutes = require('./src/routes/clientes');
+const pedidoRoutes = require('./src/routes/pedidos');
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+applyCors(app);
+applySession(app);
+applySanitizer(app);
+
 app.use(express.static(path.join(__dirname, 'public')));
-/*
+
 app.use('/api/auth', authRoutes);
-app.use('/api/products', productsRoutes);
-app.use('/api/categories', categoriesRoutes);
-*/
-app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public/index.html');
-});
-app.use((req, res) => {
-    res.status(404).json({ error: 'Ruta no encontrada' });
-});
+app.use('/api/productos', productoRoutes);
+app.use('/api/categorias', categoriaRoutes);
+app.use('/api/clientes', clienteRoutes);
+app.use('/api/pedidos', pedidoRoutes);
+
 app.use((err, req, res, next) => {
-    console.error('Error:', err.stack);
-    res.status(500).json({ 
-        error: 'Error interno del servidor',
-        mensaje: err.message 
+    console.error(`Error: ${err.message}`);
+    console.error(err.stack);
+
+    const statusCode = err.statusCode || 500;
+    const message = statusCode === 500 ? 'Error interno del servidor. Inténtelo más tarde.' : err.message;
+    
+    res.status(statusCode).json({
+        success: false,
+        message: message,
+        error: process.env.NODE_ENV === 'development' ? err.stack : undefined
     });
 });
+
 app.listen(PORT, () => {
-    console.log(`🍞 Servidor de Panadería "La Desesperanza" corriendo en http://localhost:${PORT}`);
+    console.log(` Servidor online en http://localhost:${PORT}`);
+    console.log(`Entorno: ${process.env.NODE_ENV}`);
 });
