@@ -51,17 +51,17 @@ const loginCliente = async (req, res, next) => {
     }
 
     try {
-        const [rows] = await db.query('SELECT * FROM clientes WHERE usuario = ?', [usuario]);
+        const [rows] = await db.query('SELECT * FROM clientes WHERE usuario = ? AND activo = TRUE', [usuario]);
 
         if (rows.length === 0) {
-            return res.status(401).json({ success: false, message: 'Credenciales inválidas.' });
+            return res.status(401).json({ success: false, message: 'Credenciales inválidas o cuenta inactiva.' });
         }
 
         const cliente = rows[0];
         const match = await bcrypt.compare(password, cliente.password);
 
         if (!match) {
-            return res.status(401).json({ success: false, message: 'Credenciales inválidas.' });
+            return res.status(401).json({ success: false, message: 'Credenciales inválidas o cuenta inactiva.' });
         }
 
         req.session.cliente = {

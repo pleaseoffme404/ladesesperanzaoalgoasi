@@ -22,7 +22,6 @@ app.use(express.urlencoded({ extended: true }));
 
 applyCors(app);
 applySession(app);
-applySanitizer(app);
 
 app.use(express.static(path.join(__dirname, 'public')));
 
