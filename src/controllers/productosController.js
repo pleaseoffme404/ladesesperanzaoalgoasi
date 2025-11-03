@@ -1,4 +1,15 @@
 const db = require('../services/db.service');
+const fs = require('fs').promises; 
+const path = require('path');
+
+function slugify(text) {
+    return text.toString().toLowerCase()
+        .replace(/\s+/g, '-')           
+        .replace(/[^\w\-]+/g, '')       
+        .replace(/\-\-+/g, '-')         
+        .replace(/^-+/, '')             
+        .replace(/-+$/, '');            
+}
 
 const getAllProductos = async (req, res, next) => {
     try {
@@ -45,15 +56,34 @@ const createProducto = async (req, res, next) => {
         cantidad_disponible,
         cantidad_minima,
         es_temporada,
-        temporada,
-        imagen_url
+        temporada
     } = req.body;
-
+    
     const id_admin = req.session.admin.id_administrador;
 
-    if (!nombre || !precio || !id_categoria || !id_admin) {
+    if (!nombre || !precio || !id_categoria) {
         return res.status(400).json({ success: false, message: 'Campos requeridos faltantes: nombre, precio, id_categoria.' });
     }
+    
+    let imagen_url = null;
+
+
+    if (req.file) {
+        try {
+            const slug = slugify(nombre);
+            const extension = path.extname(req.file.originalname);
+            const filename = `${slug}-${Date.now()}${extension}`;
+            const savePath = path.join(__dirname, '..', '..', 'public', 'assets', 'images', 'panes', filename);
+
+            await fs.writeFile(savePath, req.file.buffer);
+            
+            imagen_url = `/assets/images/panes/${filename}`;
+
+        } catch (uploadError) {
+            return next(uploadError);
+        }
+    }
+
 
     try {
         const query = `
@@ -68,7 +98,7 @@ const createProducto = async (req, res, next) => {
             id_categoria,
             cantidad_disponible || 0,
             cantidad_minima || 5,
-            es_temporada || false,
+            es_temporada === 'true' || es_temporada === true, 
             temporada,
             imagen_url,
             id_admin
@@ -95,27 +125,39 @@ const updateProducto = async (req, res, next) => {
         cantidad_minima,
         es_temporada,
         temporada,
-        imagen_url,
-        activo
+        activo,
+        imagen_url_actual 
     } = req.body;
 
-    if (!nombre || !precio || !id_categoria) {
-        return res.status(400).json({ success: false, message: 'Campos requeridos faltantes: nombre, precio, id_categoria.' });
+    let imagen_url = imagen_url_actual || null;
+
+    if (req.file) {
+        try {
+            const slug = slugify(nombre);
+            const extension = path.extname(req.file.originalname);
+            const filename = `${slug}-${Date.now()}${extension}`;
+            const savePath = path.join(__dirname, '..', '..', 'public', 'assets', 'images', 'panes', filename);
+            
+            await fs.writeFile(savePath, req.file.buffer);
+            
+            imagen_url = `/assets/images/panes/${filename}`;
+
+            if (imagen_url_actual) {
+                const oldPath = path.join(__dirname, '..', '..', 'public', imagen_url_actual);
+                fs.unlink(oldPath).catch(err => console.error("Error borrando imagen antigua:", err.message));
+            }
+
+        } catch (uploadError) {
+            return next(uploadError);
+        }
     }
 
     try {
         const query = `
             UPDATE productos SET
-            nombre = ?,
-            descripcion = ?,
-            precio = ?,
-            id_categoria = ?,
-            cantidad_disponible = ?,
-            cantidad_minima = ?,
-            es_temporada = ?,
-            temporada = ?,
-            imagen_url = ?,
-            activo = ?
+            nombre = ?, descripcion = ?, precio = ?, id_categoria = ?, 
+            cantidad_disponible = ?, cantidad_minima = ?, es_temporada = ?, 
+            temporada = ?, imagen_url = ?, activo = ?
             WHERE id_producto = ?
         `;
         const [result] = await db.query(query, [
@@ -125,10 +167,10 @@ const updateProducto = async (req, res, next) => {
             id_categoria,
             cantidad_disponible,
             cantidad_minima,
-            es_temporada,
+            es_temporada === 'true' || es_temporada === true,
             temporada,
             imagen_url,
-            (activo === undefined ? true : activo),
+            activo === 'true' || activo === true,
             id
         ]);
 
@@ -141,7 +183,6 @@ const updateProducto = async (req, res, next) => {
         next(error);
     }
 };
-
 const deleteProducto = async (req, res, next) => {
     const { id } = req.params;
     

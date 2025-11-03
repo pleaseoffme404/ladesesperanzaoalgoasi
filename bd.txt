@@ -19,6 +19,7 @@ CREATE TABLE clientes (
     email VARCHAR(100) UNIQUE NOT NULL,
     telefono VARCHAR(20),
     direccion VARCHAR(255)
+    activo BOOLEAN DEFAULT TRUE
 );
 
 CREATE TABLE recuperacion_password (
