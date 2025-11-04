@@ -19,11 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const temporadaCheckbox = document.getElementById('es_temporada');
     const temporadaInput = document.getElementById('temporada');
     const activoCheckbox = document.getElementById('activo');
-    const imagenInput = document.getElementById('imagen_url');
+    const imagenInput = document.getElementById('imagen_producto');
+    const imagenUrlActual = document.getElementById('imagen_url_actual');
 
-    let categoriesCache = [];
-
- 
+    let categoriesCache = []; 
 
     async function loadCategories() {
         try {
@@ -75,7 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-
     function openModal() {
         modal.style.display = 'block';
         modalError.style.display = 'none';
@@ -96,98 +94,103 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function openEditModal(id) {
-    try {
-        const response = await apiFetch(`/api/productos/${id}`, 'GET');
-        if (response.success) {
-            const product = response.data;
-            modalTitle.textContent = 'Editar Producto';
-            
-            productId.value = product.id_producto;
-            nombreInput.value = product.nombre;
-            descripcionInput.value = product.descripcion;
-            precioInput.value = product.precio;
-            categoriaSelect.value = product.id_categoria;
-            stockInput.value = product.cantidad_disponible;
-            stockMinInput.value = product.cantidad_minima;
-            temporadaCheckbox.checked = product.es_temporada;
-            temporadaInput.value = product.temporada;
-            activoCheckbox.checked = product.activo;
-            
-            document.getElementById('imagen_url_actual').value = product.imagen_url || '';
-            
-            document.getElementById('imagen_producto').value = null;
-
-            openModal();
+        try {
+            const response = await apiFetch(`/api/productos/${id}`, 'GET');
+            if (response.success) {
+                const product = response.data;
+                modalTitle.textContent = 'Editar Producto';
+                
+                productId.value = product.id_producto;
+                nombreInput.value = product.nombre;
+                descripcionInput.value = product.descripcion;
+                precioInput.value = product.precio;
+                categoriaSelect.value = product.id_categoria;
+                stockInput.value = product.cantidad_disponible;
+                stockMinInput.value = product.cantidad_minima;
+                temporadaCheckbox.checked = product.es_temporada;
+                temporadaInput.value = product.temporada;
+                activoCheckbox.checked = product.activo;
+                imagenUrlActual.value = product.imagen_url || '';
+                imagenInput.value = null;
+                
+                openModal();
+            }
+        } catch (error) {
+            console.error('Error obteniendo producto:', error);
+            alert('No se pudo cargar la información del producto.');
         }
-    } catch (error) {
-        console.error('Error obteniendo producto:', error);
-        alert('No se pudo cargar la información del producto.');
     }
-}
-
 
     async function handleFormSubmit(e) {
-    e.preventDefault();
-    saveProductButton.disabled = true;
-    saveProductButton.textContent = 'Guardando...';
-    modalError.style.display = 'none';
+        e.preventDefault();
+        modalError.style.display = 'none';
 
-    const isEdit = productId.value;
-    const method = isEdit ? 'PUT' : 'POST';
-    const endpoint = isEdit ? `/api/productos/${productId.value}` : '/api/productos';
+        const v1 = window.validateInput(nombreInput, window.validationRegex.name, 'Nombre inválido.');
+        const v2 = window.validateInput(precioInput, window.validationRegex.price, 'Precio inválido (ej. 25.50).');
+        const v3 = window.validateInput(categoriaSelect, window.validationRegex.number, 'Selecciona una categoría.');
+        const v4 = window.validateInput(stockInput, window.validationRegex.number, 'Inválido.');
+        const v5 = window.validateInput(stockMinInput, window.validationRegex.number, 'Inválido.');
+        const v6 = window.validateInput(descripcionInput, null, '', true);
+        const v7 = window.validateInput(temporadaInput, null, '', true);
 
-    const formData = new FormData();
-    
-    formData.append('nombre', nombreInput.value);
-    formData.append('descripcion', descripcionInput.value);
-    formData.append('precio', parseFloat(precioInput.value));
-    formData.append('id_categoria', parseInt(categoriaSelect.value, 10));
-    formData.append('cantidad_disponible', parseInt(stockInput.value, 10));
-    formData.append('cantidad_minima', parseInt(stockMinInput.value, 10));
-    formData.append('es_temporada', temporadaCheckbox.checked);
-    formData.append('temporada', temporadaInput.value);
-    formData.append('activo', activoCheckbox.checked);
-    
-    if (isEdit) {
-        formData.append('imagen_url_actual', document.getElementById('imagen_url_actual').value);
-    }
-    
-    const fileInput = document.getElementById('imagen_producto');
-    if (fileInput.files[0]) {
-        formData.append('imagen_producto', fileInput.files[0]);
-    }
+        if (!v1 || !v2 || !v3 || !v4 || !v5 || !v6 || !v7) {
+            modalError.textContent = 'Por favor corrige los errores del formulario.';
+            modalError.style.display = 'block';
+            return;
+        }
+        
+        saveProductButton.disabled = true;
+        saveProductButton.textContent = 'Guardando...';
 
+        const isEdit = productId.value;
+        const method = isEdit ? 'PUT' : 'POST';
+        const endpoint = isEdit ? `/api/productos/${productId.value}` : '/api/productos';
 
-    try {
-        const response = await fetch(endpoint, {
-            method: method,
-            body: formData, 
-            credentials: 'include' 
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw data; 
+        const formData = new FormData();
+        formData.append('nombre', nombreInput.value);
+        formData.append('descripcion', descripcionInput.value);
+        formData.append('precio', parseFloat(precioInput.value));
+        formData.append('id_categoria', parseInt(categoriaSelect.value, 10));
+        formData.append('cantidad_disponible', parseInt(stockInput.value, 10));
+        formData.append('cantidad_minima', parseInt(stockMinInput.value, 10));
+        formData.append('es_temporada', temporadaCheckbox.checked);
+        formData.append('temporada', temporadaInput.value);
+        formData.append('activo', activoCheckbox.checked);
+        
+        if (isEdit) {
+            formData.append('imagen_url_actual', imagenUrlActual.value);
+        }
+        if (imagenInput.files[0]) {
+            formData.append('imagen_producto', imagenInput.files[0]);
         }
 
-        if (data.success) {
-            closeModal();
-            loadProducts(); 
+        try {
+            const response = await fetch(endpoint, {
+                method: method,
+                body: formData, 
+                credentials: 'include' 
+            });
+
+            const data = await response.json();
+            if (!response.ok) throw data;
+
+            if (data.success) {
+                closeModal();
+                loadProducts(); 
+            }
+        } catch (error) {
+            modalError.textContent = error.message || 'Error al guardar.';
+            modalError.style.display = 'block';
+        } finally {
+            saveProductButton.disabled = false;
+            saveProductButton.textContent = 'Guardar Producto';
         }
-    } catch (error) {
-        modalError.textContent = error.message || 'Error al guardar.';
-        modalError.style.display = 'block';
-    } finally {
-        saveProductButton.disabled = false;
-        saveProductButton.textContent = 'Guardar Producto';
     }
-}
+
     async function handleDelete(id) {
         if (!confirm('¿Está seguro de que desea desactivar este producto? (Borrado lógico)')) {
             return;
         }
-
         try {
             const response = await apiFetch(`/api/productos/${id}`, 'DELETE');
             if (response.success) {
@@ -209,7 +212,6 @@ document.addEventListener('DOMContentLoaded', () => {
     tableBody.addEventListener('click', (e) => {
         const target = e.target;
         const id = target.getAttribute('data-id');
-
         if (target.classList.contains('btn-edit')) {
             openEditModal(id);
         } else if (target.classList.contains('btn-delete')) {
@@ -219,8 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function init() {
         await loadCategories(); 
-        await loadProducts();  
+        await loadProducts();   
     }
-
     init();
 });

@@ -9,6 +9,7 @@ router.delete('/carrito/:id', isAuthCliente, pedidosController.removeFromCarrito
 router.post('/checkout', isAuthCliente, pedidosController.crearPedido);
 
 router.get('/mis-pedidos', isAuthCliente, pedidosController.getMisPedidos);
+router.get('/:id', isAuthCliente, pedidosController.getPedidoDetalle);
 
 router.get('/admin/todos', isAuthAdmin, pedidosController.getAllPedidos);
 router.put('/admin/:id', isAuthAdmin, pedidosController.updateEstadoPedido);

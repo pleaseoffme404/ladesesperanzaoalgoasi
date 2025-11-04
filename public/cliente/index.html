@@ -14,23 +14,6 @@
 <body>
 
     <header class="client-header">
-        <a href="/" class="header-logo">La Desesperanza</a>
-        <nav class="client-nav">
-            <a href="/">Inicio</a>
-            <a href="/tienda/">Tienda</a>
-            <a href="/cliente/" class="active" id="login-link">Iniciar Sesión</a>
-            
-            <a href="/cliente/carrito/" class="cart-icon" id="cart-link">
-                <svg class="cart-icon-svg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.656-.414 1.243-1.067 1.243H4.51c-.653 0-1.137-.587-1.067-1.243L4.707 8.507c.072-.656.596-1.144 1.253-1.144h.211a.75.75 0 0 1 .75.75v.003a.75.75 0 0 1-.75.75H5.961l-.91 8.107h13.916l-.91-8.107h-.211a.75.75 0 0 1-.75-.75v-.003a.75.75 0 0 1 .75.75h.211c.657 0 1.18.487 1.253 1.144Z" />
-                </svg>
-                <span class="cart-badge" id="cart-badge">0</span>
-            </a>
-
-            <div id="client-theme-switcher" class="theme-switcher" title="Cambiar Tema">
-                <div class="theme-icon"></div>
-            </div>
-        </nav>
     </header>
 
     <main>
@@ -49,7 +32,13 @@
                     </div>
                     <p id="login-error" class="error-text"></p>
                     <button type="submit" id="login-button" class="auth-button">Ingresar</button>
-                    <p class="toggle-link">¿No tienes cuenta? <span id="toggle-to-register">Regístrate aquí</span></p>
+                    
+                    <p class="toggle-link" style="margin-top: 15px;">
+                        <a href="/cliente/recuperar-password/" class="form-link">¿Olvidaste tu contraseña?</a>
+                    </p>
+                    <p class="toggle-link" style="margin-top: 10px;">
+                        ¿No tienes cuenta? <span id="toggle-to-register">Regístrate aquí</span>
+                    </p>
                 </form>
 
                 <form id="register-form" class="auth-form">
@@ -85,12 +74,12 @@
     </main>
 
     <footer class="client-footer">
-        <p>&copy; La Desesperanza 2025</p>
     </footer>
 
     <script src="../assets/js/api.js"></script>
     <script src="../assets/js/clientNav.js"></script>
     <script src="../assets/js/clientThemeChanger.js"></script>
     <script src="js/clientAuth.js"></script>
+    <script src="../assets/js/validaciones.js"></script>
 </body>
 </html>

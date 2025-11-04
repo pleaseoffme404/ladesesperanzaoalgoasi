@@ -5,7 +5,7 @@
     text-align: center;
     padding: 60px 20px;
     background-color: var(--client-bg-tertiary);
-    background-image: url('../images/panaderia-hero-bg.jpg');
+    background-image: url('../images/hero-image.jpg');
     background-size: cover;
     background-position: center;
     min-height: 400px;
@@ -51,4 +51,52 @@
     font-weight: 600;
     margin-bottom: 30px;
     color: var(--client-text-primary);
+}
+
+.carousel {
+    position: relative;
+    width: 90%;
+    max-width: 1000px;
+    margin: 0 auto;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.carousel-track {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+}
+
+.carousel-slide {
+    min-width: 100%;
+    position: relative;
+}
+
+.carousel-slide .product-card {
+    width: 90%;
+    margin: 0 auto;
+    max-width: 400px;
+}
+
+.carousel-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(255, 255, 255, 0.7);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    z-index: 10;
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.carousel-button.prev {
+    left: 10px;
+}
+
+.carousel-button.next {
+    right: 10px;
 }

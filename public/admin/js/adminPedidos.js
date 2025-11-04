@@ -10,7 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveStatusButton = document.getElementById('save-status-button');
     const modalError = document.getElementById('modal-error-message');
 
-
     async function loadOrders() {
         try {
             const response = await apiFetch('/api/pedidos/admin/todos', 'GET');
@@ -19,11 +18,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.success) {
                 response.data.forEach(order => {
                     const row = document.createElement('tr');
-                    
                     const fecha = new Date(order.fecha_pedido).toLocaleString('es-MX');
-                    
                     const total = parseFloat(order.total).toFixed(2);
-                    
                     const statusClass = order.estado.toLowerCase().replace(' ', '-');
                     
                     row.innerHTML = `
@@ -49,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-
     function openModal(id, estadoActual) {
         modalError.style.display = 'none';
         orderIdInput.value = id;
@@ -63,12 +58,15 @@ document.addEventListener('DOMContentLoaded', () => {
         statusForm.reset();
     }
 
-
     async function handleStatusSubmit(e) {
         e.preventDefault();
+        modalError.style.display = 'none';
+        
+        const v1 = window.validateInput(statusSelect, window.validationRegex.text, 'Debes seleccionar un estado.');
+        if (!v1) return;
+        
         saveStatusButton.disabled = true;
         saveStatusButton.textContent = 'Guardando...';
-        modalError.style.display = 'none';
 
         const id = orderIdInput.value;
         const newStatus = statusSelect.value;
@@ -87,7 +85,6 @@ document.addEventListener('DOMContentLoaded', () => {
             saveStatusButton.textContent = 'Guardar Estado';
         }
     }
-
 
     modalCloseButton.addEventListener('click', closeModal);
     window.addEventListener('click', (e) => {

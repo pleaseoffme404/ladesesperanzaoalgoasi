@@ -499,3 +499,14 @@ main.dashboard-grid {
 .dashboard-list li .stock-ok {
     color: var(--admin-text-secondary);
 }
+.form-group input.is-invalid,
+.form-group textarea.is-invalid,
+.form-group select.is-invalid {
+    border-color: var(--admin-accent-red);
+}
+
+.form-group input.is-invalid:focus,
+.form-group textarea.is-invalid:focus,
+.form-group select.is-invalid:focus {
+     box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2);
+}

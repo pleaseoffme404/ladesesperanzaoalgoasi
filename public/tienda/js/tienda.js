@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await checkAuthStatus();
         await loadProducts();
         
-        if (isUserLoggedIn) {
+        if (isUserLoggedIn && userType === 'cliente') {
             await loadCart();
         }
     }
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         } catch (error) {
-            console.error('Visitante no autenticado');
+            console.log('Visitante no autenticado');
         }
     }
 
@@ -62,11 +62,16 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await apiFetch('/api/productos', 'GET');
             grid.innerHTML = '';
-            if (response.success) {
-                response.data.forEach(product => {
-                    grid.appendChild(createProductCard(product));
-                });
+            
+            if (!response.success || response.data.length === 0) {
+                grid.innerHTML = '<p>No hay productos disponibles por el momento.</p>';
+                return;
             }
+            
+            response.data.forEach(product => {
+                grid.appendChild(createProductCard(product));
+            });
+            
         } catch (error) {
             console.error('Error cargando productos:', error);
             grid.innerHTML = '<p>Error al cargar los productos. Intente de nuevo.</p>';
@@ -89,16 +94,37 @@ document.addEventListener('DOMContentLoaded', () => {
                 <p class="product-description">${product.descripcion || ''}</p>
                 <div class="product-footer">
                     <span class="product-price">$${price}</span>
-                    <button class="add-to-cart-btn" data-id="${product.id_producto}">Añadir al Carrito</button>
+                    <div class="quantity-selector">
+                        <button class="quantity-btn" data-action="decrease">-</button>
+                        <input class="quantity-input" type="number" value="1" min="1" max="99">
+                        <button class="quantity-btn" data-action="increase">+</button>
+                    </div>
+                    <button class="add-to-cart-btn" data-id="${product.id_producto}">Agregar al Carrito</button>
                 </div>
             </div>
         `;
 
-        card.querySelector('.add-to-cart-btn').addEventListener('click', handleAddToCart);
+        const qtyInput = card.querySelector('.quantity-input');
+        
+        card.querySelector('.add-to-cart-btn').addEventListener('click', (e) => handleAddToCart(e, qtyInput));
+        
+        card.querySelectorAll('.quantity-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const action = e.target.getAttribute('data-action');
+                let currentValue = parseInt(qtyInput.value, 10);
+                if (action === 'increase') {
+                    currentValue++;
+                } else if (action === 'decrease' && currentValue > 1) {
+                    currentValue--;
+                }
+                qtyInput.value = currentValue;
+            });
+        });
+
         return card;
     }
 
-    async function handleAddToCart(event) {
+    async function handleAddToCart(event, quantityInput) {
         if (!isUserLoggedIn || userType !== 'cliente') {
             alert('Por favor, inicia sesión como cliente para añadir productos al carrito.');
             window.location.href = '/cliente/';
@@ -107,14 +133,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const button = event.target;
         const productId = button.getAttribute('data-id');
+        const quantity = parseInt(quantityInput.value, 10);
         
+        if (quantity <= 0) {
+            alert('Seleccione una cantidad válida.');
+            return;
+        }
+
         button.disabled = true;
         button.textContent = 'Añadiendo...';
 
         try {
             const response = await apiFetch('/api/pedidos/carrito', 'POST', {
                 id_producto: parseInt(productId, 10),
-                cantidad: 1
+                cantidad: quantity
             });
             
             if (response.success) {
@@ -123,14 +155,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 button.textContent = 'Añadido ✓';
                 setTimeout(() => {
                     button.disabled = false;
-                    button.textContent = 'Añadir al Carrito';
+                    button.textContent = 'Agregar al Carrito';
                 }, 2000);
             }
         } catch (error) {
             console.error('Error al añadir al carrito:', error);
             alert(error.message || 'No se pudo añadir el producto.');
             button.disabled = false;
-            button.textContent = 'Añadir al Carrito';
+            button.textContent = 'Agregar al Carrito';
         }
     }
 

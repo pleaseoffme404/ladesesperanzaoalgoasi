@@ -103,11 +103,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function handleFormSubmit(e) {
         e.preventDefault();
+        modalError.style.display = 'none';
+        const isEdit = clientId.value;
+
+        const v1 = window.validateInput(usuarioInput, window.validationRegex.alphanumeric, 'Usuario inválido.');
+        const v2 = window.validateInput(passwordInput, window.validationRegex.password, 'Mínimo 8 caracteres.', isEdit);
+        const v3 = window.validateInput(nombreInput, window.validationRegex.name, 'Nombre inválido.');
+        const v4 = window.validateInput(apellidoInput, window.validationRegex.name, 'Apellido inválido.');
+        const v5 = window.validateInput(emailInput, window.validationRegex.email, 'Email inválido.');
+        const v6 = window.validateInput(telefonoInput, window.validationRegex.phone, 'Deben ser 10 dígitos.', true);
+        const v7 = window.validateInput(direccionInput, null, '', true);
+
+        if (!v1 || !v2 || !v3 || !v4 || !v5 || !v6 || !v7) {
+            modalError.textContent = 'Por favor corrige los errores del formulario.';
+            modalError.style.display = 'block';
+            return;
+        }
+
         saveClientButton.disabled = true;
         saveClientButton.textContent = 'Guardando...';
-        modalError.style.display = 'none';
-
-        const isEdit = clientId.value;
         
         const data = {
             usuario: usuarioInput.value,
@@ -162,4 +176,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     loadClients();
-});     
+});

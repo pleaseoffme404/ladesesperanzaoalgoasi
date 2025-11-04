@@ -26,16 +26,20 @@ const loginAdmin = async (req, res, next) => {
             return res.status(401).json({ success: false, message: 'Credenciales inválidas.' });
         }
 
-        req.session.admin = {
-            id_administrador: admin.id_administrador,
-            usuario: admin.usuario,
-            nombre_completo: admin.nombre_completo
-        };
+        req.session.regenerate((err) => {
+            if (err) return next(err);
 
-        res.status(200).json({
-            success: true,
-            message: 'Login de administrador exitoso.',
-            admin: req.session.admin
+            req.session.admin = {
+                id_administrador: admin.id_administrador,
+                usuario: admin.usuario,
+                nombre_completo: admin.nombre_completo
+            };
+
+            res.status(200).json({
+                success: true,
+                message: 'Login de administrador exitoso.',
+                admin: req.session.admin
+            });
         });
 
     } catch (error) {
@@ -64,19 +68,23 @@ const loginCliente = async (req, res, next) => {
             return res.status(401).json({ success: false, message: 'Credenciales inválidas o cuenta inactiva.' });
         }
 
-        req.session.cliente = {
-            id_cliente: cliente.id_cliente,
-            usuario: cliente.usuario,
-            nombre: cliente.nombre,
-            email: cliente.email
-        };
+        req.session.regenerate((err) => {
+            if (err) return next(err);
 
-        req.session.cart = [];
-
-        res.status(200).json({
-            success: true,
-            message: 'Login de cliente exitoso.',
-            cliente: req.session.cliente
+            req.session.cliente = {
+                id_cliente: cliente.id_cliente,
+                usuario: cliente.usuario,
+                nombre: cliente.nombre,
+                email: cliente.email
+            };
+    
+            req.session.cart = [];
+    
+            res.status(200).json({
+                success: true,
+                message: 'Login de cliente exitoso.',
+                cliente: req.session.cliente
+            });
         });
 
     } catch (error) {
@@ -108,12 +116,10 @@ const registerCliente = async (req, res, next) => {
         const newClientId = result.insertId;
 
         const emailHtml = `
-            <div>
-                <h2>¡Bienvenido a La Desesperanza, ${nombre}!</h2>
-                <p>Gracias por registrarte en nuestra panadería.</p>
-                <p>Tu cuenta con el usuario <strong>${usuario}</strong> ha sido creada exitosamente.</p>
-                <p>Ya puedes iniciar sesión y explorar nuestros productos.</p>
-            </div>
+            <p>¡Hola ${nombre}!</p>
+            <p>Gracias por registrarte en nuestra panadería.</p>
+            <p>Tu cuenta con el usuario <strong>${usuario}</strong> ha sido creada exitosamente.</p>
+            <p>Ya puedes iniciar sesión y explorar nuestros productos.</p>
         `;
         
         await emailService.sendEmail(email, '¡Bienvenido a La Desesperanza!', emailHtml);
@@ -177,24 +183,21 @@ const solicitarRecuperacion = async (req, res, next) => {
 
         const cliente = rows[0];
         const token = crypto.randomBytes(32).toString('hex');
-        const expiracion = new Date(Date.now() + 3600000); // 1 hora
+        const expiracion = new Date(Date.now() + 3600000);
 
         await db.query(
             'INSERT INTO recuperacion_password (id_cliente, token, fecha_expiracion) VALUES (?, ?, ?)',
             [cliente.id_cliente, token, expiracion]
         );
 
-        const resetLink = `http://localhost:${process.env.PORT || 3000}/reset.html?token=${token}`;
+        const resetLink = `http://localhost:${process.env.PORT || 3000}/cliente/reset-password/index.html?token=${token}`;
 
         const emailHtml = `
-            <div>
-                <h2>Recuperación de Contraseña - La Desesperanza</h2>
-                <p>Hola ${cliente.nombre},</p>
-                <p>Hemos recibido una solicitud para restablecer tu contraseña. Haz clic en el siguiente enlace para continuar:</p>
-                <a href="${resetLink}" target="_blank">Restablecer mi contraseña</a>
-                <p>Si no solicitaste esto, por favor ignora este correo.</p>
-                <p>Este enlace expirará en 1 hora.</p>
-            </div>
+            <p>Hola ${cliente.nombre},</p>
+            <p>Hemos recibido una solicitud para restablecer tu contraseña. Haz clic en el siguiente enlace para continuar:</p>
+            <a href="${resetLink}" target="_blank" style="background-color: #8B4513; color: #ffffff; padding: 10px 15px; text-decoration: none; border-radius: 5px; display: inline-block;">Restablecer mi contraseña</a>
+            <p>Si no solicitaste esto, por favor ignora este correo.</p>
+            <p>Este enlace expirará en 1 hora.</p>
         `;
         
         await emailService.sendEmail(email, 'Recuperación de Contraseña', emailHtml);

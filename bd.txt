@@ -78,3 +78,9 @@ CREATE TABLE detalle_pedidos (
 INSERT INTO administradores (usuario, password, nombre_completo, email, activo) VALUES
 ('admin', '$2a$10$ZMKGAxQ467/IZRj.O9Lgg.XrCXe8OSRofob.ePF.4.P5RdTOuIgqu', 'Jefe Desesperación', 'admin@desesperanza.com', TRUE),
 ('panadero1', '$2a$10$LgoJdtuYSWZz5Q5qY9UzeOfqjcBPbO.n1mzWbjtJ6fQwnXfcDaFeK', 'Panadero Espectral', 'panadero1@desesperanza.com', TRUE);
+
+
+INSERT INTO categorias (nombre, descripcion) VALUES
+('Panes Dulces', 'Variedad de panadería dulce tradicional.'),
+('Salados', 'Opciones de pan salado, baguettes y más.'),
+('Postres', 'Tartas, pasteles y otras delicias dulces.');

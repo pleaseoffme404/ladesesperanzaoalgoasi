@@ -138,7 +138,7 @@ const crearPedido = async (req, res, next) => {
                 [item.cantidad, item.id_producto]
             ));
             
-            emailHtmlDetalle += `<tr><td>${producto.nombre}</td><td>${item.cantidad}</td><td>$${parseFloat(producto.precio).toFixed(2)}</td><td>$${subtotal.toFixed(2)}</td></tr>`;
+            emailHtmlDetalle += `<tr style="border-bottom: 1px solid #f0ebe5;"><td style="padding: 10px;">${producto.nombre}</td><td style="padding: 10px;">${item.cantidad}</td><td style="padding: 10px;">$${parseFloat(producto.precio).toFixed(2)}</td><td style="padding: 10px;">$${subtotal.toFixed(2)}</td></tr>`;
         }
 
         await Promise.all(detalleQueries);
@@ -149,31 +149,29 @@ const crearPedido = async (req, res, next) => {
         req.session.cart = [];
 
         const emailHtml = `
-            <div>
-                <h2>¡Gracias por tu pedido, ${nombre_cliente}!</h2>
-                <p>Hemos recibido tu pedido #${id_pedido} y lo estamos procesando.</p>
-                <h3>Resumen del Pedido</h3>
-                <table border="1" cellpadding="5" cellspacing="0" style="width:100%; border-collapse: collapse;">
-                    <thead>
-                        <tr>
-                            <th>Producto</th>
-                            <th>Cantidad</th>
-                            <th>Precio Unitario</th>
-                            <th>Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${emailHtmlDetalle}
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="3" style="text-align:right;"><strong>Total:</strong></td>
-                            <td><strong>$${totalPedido.toFixed(2)}</strong></td>
-                        </tr>
-                    </tfoot>
-                </table>
-                <p>Recibirás una notificación cuando tu pedido sea enviado.</p>
-            </div>
+            <p>¡Gracias por tu pedido, ${nombre_cliente}!</p>
+            <p>Hemos recibido tu pedido #${id_pedido} y lo estamos procesando.</p>
+            <h3>Resumen del Pedido</h3>
+            <table style="width:100%; border-collapse: collapse; text-align: left;">
+                <thead style="background-color: #f0ebe5;">
+                    <tr>
+                        <th style="padding: 10px;">Producto</th>
+                        <th style="padding: 10px;">Cantidad</th>
+                        <th style="padding: 10px;">Precio Unit.</th>
+                        <th style="padding: 10px;">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${emailHtmlDetalle}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="3" style="padding: 10px; text-align:right; font-weight: bold;">Total:</td>
+                        <td style="padding: 10px; font-weight: bold; font-size: 1.1em;">$${totalPedido.toFixed(2)}</td>
+                    </tr>
+                </tfoot>
+            </table>
+            <p>Recibirás una notificación cuando tu pedido sea enviado.</p>
         `;
         
         await emailService.sendEmail(email_cliente, `Confirmación de Pedido #${id_pedido}`, emailHtml);
@@ -248,12 +246,44 @@ const updateEstadoPedido = async (req, res, next) => {
             if(pedidoInfo.length > 0) {
                 const { email, nombre } = pedidoInfo[0];
                 const subject = `Actualización de tu Pedido #${id}`;
-                const html = `<p>Hola ${nombre}, tu pedido #${id} ha sido actualizado al estado: <strong>${estado}</strong>.</p>`;
+                const html = `<p>Hola ${nombre},</p><p>El estado de tu pedido #${id} ha sido actualizado a: <strong>${estado}</strong>.</p>`;
                 await emailService.sendEmail(email, subject, html);
             }
         }
 
         res.status(200).json({ success: true, message: 'Estado del pedido actualizado.' });
+    } catch (error) {
+        next(error);
+    }
+};
+
+const getPedidoDetalle = async (req, res, next) => {
+    const { id } = req.params;
+    const id_cliente = req.session.cliente.id_cliente;
+
+    try {
+        const [pedidos] = await db.query(
+            'SELECT * FROM pedidos WHERE id_pedido = ? AND id_cliente = ?',
+            [id, id_cliente]
+        );
+
+        if (pedidos.length === 0) {
+            return res.status(404).json({ success: false, message: 'Pedido no encontrado.' });
+        }
+
+        const [detalles] = await db.query(
+            'SELECT dp.*, p.nombre FROM detalle_pedidos dp JOIN productos p ON dp.id_producto = p.id_producto WHERE dp.id_pedido = ?',
+            [id]
+        );
+
+        res.status(200).json({
+            success: true,
+            data: {
+                pedido: pedidos[0],
+                detalles: detalles
+            }
+        });
+
     } catch (error) {
         next(error);
     }
@@ -266,5 +296,6 @@ module.exports = {
     crearPedido,
     getMisPedidos,
     getAllPedidos,
-    updateEstadoPedido
+    updateEstadoPedido,
+    getPedidoDetalle
 };
