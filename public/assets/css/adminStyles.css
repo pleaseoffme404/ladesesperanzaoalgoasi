@@ -386,3 +386,116 @@ button:disabled {
 .form-group input[type="file"]::file-selector-button:hover {
     background-color: var(--admin-accent-primary);
 }
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    display: inline-block;
+}
+
+.status-pendiente {
+    background-color: #f0ad4e;
+    color: #fff;
+}
+
+.status-enviado {
+    background-color: var(--admin-accent-primary);
+    color: #fff;
+}
+
+.status-completado {
+    background-color: var(--admin-accent-green);
+    color: #fff;
+}
+
+.status-cancelado {
+    background-color: var(--admin-accent-red);
+    color: #fff;
+}
+
+.status-badge.status-activo {
+    background-color: var(--admin-accent-green);
+    color: #fff;
+}
+
+.status-badge.status-inactivo {
+    background-color: var(--admin-bg-tertiary);
+    color: var(--admin-text-secondary);
+}
+
+main.dashboard-grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.dashboard-section {
+    background-color: var(--admin-bg-secondary);
+    border: 1px solid var(--admin-bg-tertiary);
+    border-radius: 8px;
+    padding: 20px;
+}
+
+.dashboard-section h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--admin-bg-tertiary);
+    padding-bottom: 10px;
+    color: var(--admin-text-secondary);
+    font-size: 1.1rem;
+}
+
+.summary-cards {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.summary-card {
+    background-color: var(--admin-bg-secondary);
+    border: 1px solid var(--admin-bg-tertiary);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+}
+
+.summary-card p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--admin-text-secondary);
+}
+
+.summary-card .stat-number {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: var(--admin-text-primary);
+    margin: 5px 0;
+}
+
+.dashboard-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.dashboard-list li {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 5px;
+    border-bottom: 1px solid var(--admin-bg-tertiary);
+}
+.dashboard-list li:last-child {
+    border-bottom: none;
+}
+
+.dashboard-list li .stock-low {
+    color: var(--admin-accent-red);
+    font-weight: 600;
+}
+
+.dashboard-list li .stock-ok {
+    color: var(--admin-text-secondary);
+}

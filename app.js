@@ -9,6 +9,7 @@ const PORT = process.env.PORT || 3000;
 
 const { applyCors } = require('./src/middlewares/cors');
 const { applySession } = require('./src/middlewares/session');
+
 const { applySanitizer } = require('./src/middlewares/sanitizer');
 
 const authRoutes = require('./src/routes/auth');
@@ -22,8 +23,8 @@ app.use(express.urlencoded({ extended: true }));
 
 applyCors(app);
 applySession(app);
-
 app.use(express.static(path.join(__dirname, 'public')));
+
 
 app.use('/api/auth', authRoutes);
 app.use('/api/productos', productoRoutes);
@@ -46,6 +47,6 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(PORT, () => {
-    console.log(` Servidor online en http://localhost:${PORT}`);
+    console.log(`Servidor online en http://localhost:${PORT}`);
     console.log(`Entorno: ${process.env.NODE_ENV}`);
 });

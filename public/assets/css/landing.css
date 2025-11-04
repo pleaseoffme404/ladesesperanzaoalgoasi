@@ -1,0 +1,54 @@
+.hero {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 20px;
+    background-color: var(--client-bg-tertiary);
+    background-image: url('../images/panaderia-hero-bg.jpg');
+    background-size: cover;
+    background-position: center;
+    min-height: 400px;
+    color: #fff;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.hero-content h1 {
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 0;
+}
+
+.hero-content p {
+    font-size: 1.25rem;
+    margin: 15px 0 30px 0;
+}
+
+.cta-button {
+    background-color: var(--client-accent-primary);
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.cta-button:hover {
+    background-color: var(--client-accent-secondary);
+}
+
+.featured-section {
+    padding: 40px 0;
+    text-align: center;
+}
+
+.featured-section h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 30px;
+    color: var(--client-text-primary);
+}

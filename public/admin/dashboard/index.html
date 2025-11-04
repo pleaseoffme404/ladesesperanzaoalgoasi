@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | La Desesperanza</title>
     
-    <link rel="stylesheet" href="/assets/css/adminStyles.css">
-    <link rel="stylesheet" href="/assets/css/adminHeader.css">
+    <link rel="stylesheet" href="../../assets/css/adminStyles.css">
+    <link rel="stylesheet" href="../../assets/css/adminHeader.css">
 </head>
 <body>
 
@@ -27,24 +27,78 @@
                 <p>Bienvenido, <strong id="admin-username-placeholder">Cargando...</strong></p>
             </div>
             <button id="admin-logout-button">Cerrar Sesión</button>
-            
             <div id="admin-theme-switcher" class="theme-switcher" title="Cambiar Tema">
                 <div class="theme-icon"></div>
             </div>
         </div>
     </header>
 
-    <main>
-        <h2>Panel de Control</h2>
-        <p>Aquí irá el contenido principal del dashboard (gráficas, resúmenes, etc.)</p>
+    <main class="dashboard-grid">
+        <div class="summary-cards">
+            <div class="summary-card">
+                <p>Ingresos Totales (Completado)</p>
+                <h2 id="total-ingresos-stat" class="stat-number">-</h2>
+            </div>
+            <div class="summary-card">
+                <p>Pedidos Pendientes</p>
+                <h2 id="total-pendientes-stat" class="stat-number">-</h2>
+            </div>
+            <div class="summary-card">
+                <p>Pedidos Totales</p>
+                <h2 id="total-pedidos-stat" class="stat-number">-</h2>
+            </div>
+            <div class="summary-card">
+                <p>Clientes Registrados</p>
+                <h2 id="total-clientes-stat" class="stat-number">-</h2>
+            </div>
+            <div class="summary-card">
+                <p>Productos Activos</p>
+                <h2 id="total-productos-stat" class="stat-number">-</h2>
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+            <h3>Pedidos Recientes</h3>
+            <div class="table-container">
+                <table style="margin-top: 0;">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Cliente</th>
+                            <th>Total</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-orders-list">
+                        <tr><td colspan="4">Cargando...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="dashboard-section">
+            <h3>Alerta de Stock Bajo</h3>
+            <ul id="low-stock-list" class="dashboard-list">
+                <li>Cargando...</li>
+            </ul>
+        </div>
+        
+        <div class="dashboard-section">
+            <h3>Clientes Nuevos</h3>
+            <ul id="recent-clients-list" class="dashboard-list">
+                <li>Cargando...</li>
+            </ul>
+        </div>
     </main>
-<footer class="admin-footer">
+
+    <footer class="admin-footer">
         <p>&copy; La Desesperanza 2025</p>
     </footer>
 
     <script src="../../assets/js/api.js"></script>
-<script src="../js/adminDashboard.js"></script>
-    <script src="../js/adminProductos.js"></script>
+    <script src="../js/adminThemeChanger.js"></script>
+    <script src="../js/adminDashboard.js"></script>
+    <script src="../js/adminDashboardLogic.js"></script>
 
 </body>
 </html>

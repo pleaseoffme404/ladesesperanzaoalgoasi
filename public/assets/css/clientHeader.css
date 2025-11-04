@@ -1,0 +1,116 @@
+.client-header {
+    width: 100%;
+    padding: 15px 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--client-bg-secondary);
+    border-bottom: 1px solid var(--client-bg-tertiary);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-sizing: border-box;
+}
+
+.header-logo {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--client-accent-primary);
+    text-decoration: none;
+}
+
+.client-nav {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.client-nav a {
+    text-decoration: none;
+    color: var(--client-text-secondary);
+    font-size: 16px;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: color 0.2s ease;
+}
+
+.client-nav a:hover {
+    color: var(--client-accent-primary);
+}
+
+.client-nav a.active {
+    color: var(--client-accent-primary);
+    font-weight: 700;
+}
+
+.cart-icon {
+    position: relative;
+    cursor: pointer;
+    padding: 10px;
+}
+
+.cart-icon-svg {
+    width: 24px;
+    height: 24px;
+    stroke: var(--client-text-primary);
+    transition: stroke 0.2s ease;
+}
+.cart-icon:hover .cart-icon-svg {
+    stroke: var(--client-accent-primary);
+}
+
+.cart-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: var(--client-accent-primary);
+    color: #ffffff;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transform: translate(25%, -25%);
+    display: none;
+}
+
+.cart-badge.visible {
+    display: flex;
+}
+.theme-switcher {
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.3s;
+    background-color: var(--client-bg-primary);
+}
+.theme-switcher:hover {
+    background-color: var(--client-bg-tertiary);
+}
+
+.theme-icon {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    position: relative;
+    transition: all 0.5s ease;
+    background-color: var(--client-text-primary);
+}
+
+body.client-light-theme .theme-icon {
+    background-color: var(--client-text-primary);
+}
+
+body:not(.client-light-theme) .theme-icon {
+    background-color: transparent;
+    box-shadow: -3px 3px 0 0 var(--client-text-primary);
+    transform: rotate(-45deg);
+}

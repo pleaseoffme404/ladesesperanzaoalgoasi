@@ -1,0 +1,59 @@
+:root {
+    --client-bg-primary: #3a3a3a;
+    --client-bg-secondary: #2c2c2c;
+    --client-bg-tertiary: #444;
+    --client-text-primary: #f1f1f1;
+    --client-text-secondary: #adb5bd;
+    --client-accent-primary: #c7a17a;
+    --client-accent-secondary: #a0522d;
+    --client-font-family: 'Lato', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body.client-light-theme {
+    --client-bg-primary: #fdfcf7;
+    --client-bg-secondary: #ffffff;
+    --client-bg-tertiary: #f0ebe5;
+    --client-text-primary: #3a3a3a;
+    --client-text-secondary: #5c5c5c;
+    --client-accent-primary: #8B4513;
+    --client-accent-secondary: #a0522d;
+}
+
+body {
+    font-family: var(--client-font-family);
+    background-color: var(--client-bg-primary);
+    color: var(--client-text-primary);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+main {
+    flex-grow: 1;
+    padding: 20px 0;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.client-footer {
+    width: 100%;
+    text-align: center;
+    padding: 20px 0;
+    border-top: 1px solid var(--client-bg-tertiary);
+    background-color: var(--client-bg-secondary);
+    margin-top: auto;
+}
+
+.client-footer p {
+    font-size: 14px;
+    color: var(--client-text-secondary);
+    font-weight: 500;
+    margin: 0;
+}
