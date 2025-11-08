@@ -1,0 +1,72 @@
+.cuenta-container {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.cuenta-nav {
+    width: 250px;
+    flex-shrink: 0;
+    background-color: var(--client-bg-secondary);
+    border-radius: 8px;
+    border: 1px solid var(--client-bg-tertiary);
+    padding: 15px;
+    height: fit-content;
+}
+
+.cuenta-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.cuenta-nav li button {
+    display: block;
+    padding: 12px 15px;
+    text-decoration: none;
+    color: var(--client-text-secondary);
+    font-weight: 500;
+    border-radius: 6px;
+    transition: background-color 0.2s, color 0.2s;
+    cursor: pointer;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    font-size: 1rem;
+    font-family: var(--client-font-family);
+}
+
+.cuenta-nav li button:hover {
+    background-color: var(--client-bg-tertiary);
+    color: var(--client-text-primary);
+}
+
+.cuenta-nav li button.active {
+    background-color: var(--client-accent-primary);
+    color: #ffffff;
+}
+
+.cuenta-content {
+    flex-grow: 1;
+}
+
+.cuenta-view {
+    display: none;
+    background-color: var(--client-bg-secondary);
+    border-radius: 8px;
+    border: 1px solid var(--client-bg-tertiary);
+    padding: 30px;
+}
+.cuenta-view.active {
+    display: block;
+}
+
+.cuenta-view h2 {
+    margin-top: 0;
+    font-size: 1.8rem;
+    color: var(--client-text-primary);
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--client-bg-tertiary);
+}

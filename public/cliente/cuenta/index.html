@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Cuenta | La Desesperanza</title>
+    
+    <link rel="stylesheet" href="../../assets/css/clientBase.css">
+    <link rel="stylesheet" href="../../assets/css/clientHeader.css">
+    <link rel="stylesheet" href="../../assets/css/clientCuenta.css">
+    <link rel="stylesheet" href="../../assets/css/clientAuth.css">
+    <link rel="stylesheet" href="../../assets/css/clientMisPedidos.css">
+    <link rel="stylesheet" href="../../assets/css/clientPerfil.css">
+    <link rel="stylesheet" href="../../assets/css/tienda.css">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="client-header">
+    </header>
+
+    <main>
+        <div class="container cuenta-container">
+            <aside class="cuenta-nav">
+                <ul>
+                    <li><button class="cuenta-tab active" data-view="view-perfil">Editar Perfil</button></li>
+                    <li><button class="cuenta-tab" data-view="view-pedidos">Mis Pedidos</button></li>
+                    <li><button class="cuenta-tab" data-view="view-favoritos">Mis Favoritos</button></li>
+                </ul>
+            </aside>
+
+            <section class="cuenta-content">
+
+                <div id="view-perfil" class="cuenta-view active">
+                    <h2>Editar Perfil</h2>
+                    <form id="profile-form">
+                        <div class="form-group" style="text-align: center; margin-bottom: 20px;">
+                            <img src="/assets/images/perfil/default-avatar.png" id="profile-pic-preview" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; border: 2px solid var(--client-bg-tertiary);">
+                            <br>
+                            <label for="imagen_perfil" style="cursor: pointer; color: var(--client-accent-primary); font-size: 0.9rem;">Cambiar foto</label>
+                            <input type="file" id="imagen_perfil" accept="image/png, image/jpeg" style="display: none;">
+                            <input type="hidden" id="imagen_perfil_url_actual">
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="usuario">Usuario (no se puede cambiar)</label>
+                                <input type="text" id="usuario" disabled>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="nombre">Nombre</label>
+                                <input type="text" id="nombre" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="apellido">Apellido</label>
+                                <input type="text" id="apellido" required>
+                            </div>
+                            <div class="form-group form-group-full">
+                                <label for="telefono">Teléfono</label>
+                                <input type="tel" id="telefono">
+                            </div>
+                            <div class="form-group form-group-full">
+                                <label for="direccion">Dirección</label>
+                                <textarea id="direccion" rows="3"></textarea>
+                            </div>
+                        </div>
+                        <p id="profile-message" class="form-message"></p>
+                        <button type="submit" id="save-profile-button" class="profile-button">Guardar Cambios</button>
+                    </form>
+
+                    <hr class="form-divider">
+
+                    <h2>Cambiar Contraseña</h2>
+                    <form id="password-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="oldPassword">Contraseña Actual</label>
+                                <input type="password" id="oldPassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="newPassword">Contraseña Nueva</label>
+                                <input type="password" id="newPassword" required>
+                            </div>
+                        </div>
+                        <p id="password-message" class="form-message"></p>
+                        <button type="submit" id="save-password-button" class="profile-button">Actualizar Contraseña</button>
+                    </form>
+                </div>
+
+                <div id="view-pedidos" class="cuenta-view">
+                    <h2>Historial de Pedidos</h2>
+                    <div id="orders-list-container">
+                    </div>
+                    <p id="no-orders-message">Aún no has realizado ningún pedido.</p>
+                </div>
+
+                <div id="view-favoritos" class="cuenta-view">
+                    <h2>Mis Favoritos</h2>
+                    <div id="favoritos-grid-container" class="product-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+                    </div>
+                    <p id="no-favoritos-message">No tienes productos favoritos.</p>
+                </div>
+
+            </section>
+        </div>
+    </main>
+
+    <footer class="client-footer-detailed">
+    </footer>
+
+    <script src="../../assets/js/api.js"></script>
+    <script src="../../assets/js/clientNav.js"></script>
+    <script src="../../assets/js/clientThemeChanger.js"></script>
+    <script src="../../assets/js/validaciones.js"></script>
+    <script src="../js/clientCuenta.js"></script>
+</body>
+</html>
