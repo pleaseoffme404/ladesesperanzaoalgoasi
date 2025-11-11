@@ -152,6 +152,7 @@
   color: var(--client-text-secondary);
   border: 1px solid var(--client-bg-tertiary);
   font-weight: 600;
+  margin-left:10px
 }
 
 .favorite-checkbox {

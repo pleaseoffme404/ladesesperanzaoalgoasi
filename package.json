@@ -19,6 +19,7 @@
     "multer": "^2.0.2",
     "mysql2": "^3.15.3",
     "nodemailer": "^7.0.10",
+    "path": "^0.12.7",
     "perfect-express-sanitizer": "^2.0.2",
     "router": "^2.2.0",
     "xss-clean": "^0.1.4"

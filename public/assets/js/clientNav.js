@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isUserLoggedIn = false;
     let userType = null;
     let currentCart = [];
-    let userData = null;
+    let userData = {};
 
     async function initializeHeader() {
         try {
@@ -17,17 +17,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 userData = data.usuario;
                 
                 if (userType === 'cliente') {
-                    await loadCart();
-                    await loadProfileData();
+                    await Promise.all([
+                        loadCart(),
+                        loadProfileData()
+                    ]);
                 }
             } else {
                 handleNotAuthenticated();
             }
             renderHeader();
+            setupThemeChanger();
+            setupHeaderListeners();
         } catch (error) {
             console.log('Visitante no autenticado.');
             handleNotAuthenticated();
             renderHeader();
+            setupThemeChanger();
+            setupHeaderListeners();
         }
     }
 
@@ -43,14 +49,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderHeader() {
+        const path = window.location.pathname;
+        const activeTienda = (path === '/tienda/' || path === '/tienda/index.html') ? 'active' : '';
+        const activeInicio = (path === '/' || path === '/index.html') ? 'active' : '';
+
         let navHtml = `
             <a href="/" class="header-logo">La Desesperanza</a>
             <nav class="client-nav">
-                <a href="/">Inicio</a>
-                <a href="/tienda/">Tienda</a>
+                <a href="/" class="${activeInicio}">Inicio</a>
+                <a href="/tienda/" class="${activeTienda}">Tienda</a>
         `;
 
         if (isUserLoggedIn && userType === 'cliente') {
+            const activeCuenta = (path.startsWith('/cliente/')) ? 'active' : '';
             navHtml += `
                 <a href="/cliente/cuenta/?view=pedidos">Mis Pedidos</a>
                 <a href="/cliente/cuenta/?view=favoritos">Favoritos</a>
@@ -66,7 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <img src="${userData.imagen_perfil_url || '/assets/images/perfil/default-avatar.png'}" alt="Foto de perfil" class="profile-pic" id="profile-pic-btn">
                     <div class="profile-dropdown" id="profile-dropdown">
                         <div class="dropdown-header">
-                            <p>${userData.nombre}</p>
+                            <p>${userData.nombre || userData.usuario}</p>
                             <span>${userData.email}</span>
                         </div>
                         <a href="/cliente/cuenta/?view=perfil" class="dropdown-item">Mi Perfil</a>
@@ -78,7 +89,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (isUserLoggedIn && userType === 'admin') {
             navHtml += `<a href="/admin/dashboard/">Panel Admin</a>`;
         } else {
-            navHtml += `<a href="/cliente/" id="login-link">Iniciar Sesión</a>`;
+            const activeLogin = (path.startsWith('/cliente/')) ? 'active' : '';
+            navHtml += `<a href="/cliente/" id="login-link" class="${activeLogin}">Iniciar Sesión</a>`;
         }
 
         navHtml += `
@@ -92,7 +104,39 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         
         header.innerHTML = navHtml;
-        setupHeaderListeners();
+    }
+
+    function setupThemeChanger() {
+        const themeCheckbox = document.getElementById('client-theme-checkbox');
+        const body = document.body;
+        
+        if (!themeCheckbox) return;
+
+        const applyTheme = (theme) => {
+            if (theme === 'light') {
+                body.classList.add('client-light-theme');
+                themeCheckbox.checked = true;
+            } else {
+                body.classList.remove('client-light-theme');
+                themeCheckbox.checked = false;
+            }
+        };
+
+        let currentTheme = localStorage.getItem('client_theme');
+
+        if (!currentTheme) {
+            const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
+            currentTheme = prefersLight ? 'light' : 'dark';
+            localStorage.setItem('client_theme', currentTheme);
+        }
+        
+        applyTheme(currentTheme);
+
+        themeCheckbox.addEventListener('change', () => {
+            const newTheme = themeCheckbox.checked ? 'light' : 'dark';
+            localStorage.setItem('client_theme', newTheme);
+            applyTheme(newTheme);
+        });
     }
 
     function setupHeaderListeners() {
@@ -111,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const profilePicBtn = document.getElementById('profile-pic-btn');
         const profileDropdown = document.getElementById('profile-dropdown');
-        if (profilePicBtn) {
+        if (profilePicBtn && profileDropdown) {
             profilePicBtn.addEventListener('click', () => {
                 profileDropdown.classList.toggle('visible');
             });

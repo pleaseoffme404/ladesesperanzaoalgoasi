@@ -70,3 +70,14 @@
     padding-bottom: 15px;
     border-bottom: 1px solid var(--client-bg-tertiary);
 }
+#favoritos-grid-container.product-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 300px));
+    justify-content: center;
+}
+
+#no-favoritos-message {
+    display: none;
+    text-align: center;
+    font-size: 1.1rem;
+    color: var(--client-text-secondary);
+}

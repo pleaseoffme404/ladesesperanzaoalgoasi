@@ -1,6 +1,7 @@
 const db = require('../services/db.service');
 const bcrypt = require('bcrypt');
-
+const fs = require('fs').promises;
+const path = require('path');
 const BCRYPT_SALT_ROUNDS = 10;
 
 function slugify(text) {
