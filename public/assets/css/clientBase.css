@@ -1,11 +1,11 @@
 :root {
-    --client-bg-primary: #3a3a3a;
-    --client-bg-secondary: #2c2c2c;
-    --client-bg-tertiary: #444;
-    --client-text-primary: #f1f1f1;
-    --client-text-secondary: #adb5bd;
-    --client-accent-primary: #c7a17a;
-    --client-accent-secondary: #a0522d;
+    --client-bg-primary: #1F2937;
+    --client-bg-secondary: #374151;
+    --client-bg-tertiary: #4B5563;
+    --client-text-primary: #F3F4F6;
+    --client-text-secondary: #9CA3AF;
+    --client-accent-primary: #E67E22;
+    --client-accent-secondary: #F39C12;
     --client-font-family: 'Lato', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
@@ -15,8 +15,8 @@ body.client-light-theme {
     --client-bg-tertiary: #f0ebe5;
     --client-text-primary: #3a3a3a;
     --client-text-secondary: #5c5c5c;
-    --client-accent-primary: #8B4513;
-    --client-accent-secondary: #a0522d;
+    --client-accent-primary: #D35400;
+    --client-accent-secondary: #A0522D;
 }
 
 body {
@@ -42,18 +42,50 @@ main {
     margin: 0 auto;
 }
 
-.client-footer {
-    width: 100%;
-    text-align: center;
-    padding: 20px 0;
-    border-top: 1px solid var(--client-bg-tertiary);
-    background-color: var(--client-bg-secondary);
-    margin-top: auto;
+.switch {
+  font-size: 14px;
+  position: relative;
+  display: inline-block;
+  width: 3.5em;
+  height: 2em;
 }
 
-.client-footer p {
-    font-size: 14px;
-    color: var(--client-text-secondary);
-    font-weight: 500;
-    margin: 0;
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  border: 2px solid var(--client-bg-tertiary);
+  border-radius: 50px;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 1.4em;
+  width: 1.4em;
+  left: 0.2em;
+  bottom: 0.2em;
+  background-color: var(--client-text-primary);
+  border-radius: inherit;
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+}
+
+body.client-light-theme .slider:before {
+    background-color: var(--client-text-primary);
+}
+
+.switch input:checked + .slider {
+  box-shadow: 0 0 10px var(--client-accent-primary);
+  border: 2px solid var(--client-accent-primary);
+}
+
+.switch input:checked + .slider:before {
+  transform: translateX(1.5em);
 }

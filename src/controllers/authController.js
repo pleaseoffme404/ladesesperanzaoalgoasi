@@ -2,6 +2,7 @@ const db = require('../services/db.service');
 const emailService = require('../services/email.service');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+const path = require('path');
 
 const BCRYPT_SALT_ROUNDS = 10;
 

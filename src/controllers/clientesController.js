@@ -1,12 +1,22 @@
 const db = require('../services/db.service');
 const bcrypt = require('bcrypt');
-
+const fs = require('fs').promises;
+const path = require('path');
 const BCRYPT_SALT_ROUNDS = 10;
+
+function slugify(text) {
+    return text.toString().toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^\w\-]+/g, '')
+        .replace(/\-\-+/g, '-')
+        .replace(/^-+/, '')
+        .replace(/-+$/, '');
+}
 
 const getMiPerfil = async (req, res, next) => {
     const id_cliente = req.session.cliente.id_cliente;
     try {
-        const [rows] = await db.query('SELECT id_cliente, usuario, nombre, apellido, email, telefono, direccion FROM clientes WHERE id_cliente = ?', [id_cliente]);
+        const [rows] = await db.query('SELECT id_cliente, usuario, nombre, apellido, email, telefono, direccion, imagen_perfil_url FROM clientes WHERE id_cliente = ?', [id_cliente]);
         if (rows.length === 0) {
             return res.status(404).json({ success: false, message: 'Perfil no encontrado.' });
         }
@@ -18,10 +28,33 @@ const getMiPerfil = async (req, res, next) => {
 
 const updateMiPerfil = async (req, res, next) => {
     const id_cliente = req.session.cliente.id_cliente;
-    const { nombre, apellido, email, telefono, direccion } = req.body;
+    const { nombre, apellido, email, telefono, direccion, imagen_perfil_url_actual } = req.body;
 
     if (!nombre || !apellido || !email) {
         return res.status(400).json({ success: false, message: 'Campos requeridos faltantes: nombre, apellido, email.' });
+    }
+    
+    let imagen_perfil_url = imagen_perfil_url_actual || null;
+
+    if (req.file) {
+        try {
+            const slug = slugify(req.session.cliente.usuario);
+            const extension = path.extname(req.file.originalname);
+            const filename = `perfil-${slug}-${Date.now()}${extension}`;
+            const savePath = path.join(__dirname, '..', '..', 'public', 'assets', 'images', 'perfil', filename);
+
+            await fs.writeFile(savePath, req.file.buffer);
+            imagen_perfil_url = `/assets/images/perfil/${filename}`;
+            
+            const defaultAvatar = '/assets/images/perfil/default-avatar.png';
+            if (imagen_perfil_url_actual && imagen_perfil_url_actual !== defaultAvatar) {
+                const oldPath = path.join(__dirname, '..', '..', 'public', imagen_perfil_url_actual);
+                fs.unlink(oldPath).catch(err => console.error("Error borrando imagen antigua:", err.message));
+            }
+
+        } catch (uploadError) {
+            return next(uploadError);
+        }
     }
 
     try {
@@ -31,8 +64,8 @@ const updateMiPerfil = async (req, res, next) => {
         }
 
         const [result] = await db.query(
-            'UPDATE clientes SET nombre = ?, apellido = ?, email = ?, telefono = ?, direccion = ? WHERE id_cliente = ?',
-            [nombre, apellido, email, telefono, direccion, id_cliente]
+            'UPDATE clientes SET nombre = ?, apellido = ?, email = ?, telefono = ?, direccion = ?, imagen_perfil_url = ? WHERE id_cliente = ?',
+            [nombre, apellido, email, telefono, direccion, imagen_perfil_url, id_cliente]
         );
 
         if (result.affectedRows === 0) {
@@ -42,7 +75,11 @@ const updateMiPerfil = async (req, res, next) => {
         req.session.cliente.nombre = nombre;
         req.session.cliente.email = email;
 
-        res.status(200).json({ success: true, message: 'Perfil actualizado exitosamente.' });
+        res.status(200).json({ 
+            success: true, 
+            message: 'Perfil actualizado exitosamente.',
+            nuevaImagenUrl: imagen_perfil_url 
+        });
     } catch (error) {
         next(error);
     }

@@ -2,9 +2,10 @@ const express = require('express');
 const router = express.Router();
 const clientesController = require('../controllers/clientesController');
 const { isAuthCliente, isAuthAdmin } = require('../middlewares/auth');
+const uploadPerfil = require('../middlewares/uploadPerfil');
 
 router.get('/perfil', isAuthCliente, clientesController.getMiPerfil);
-router.put('/perfil', isAuthCliente, clientesController.updateMiPerfil);
+router.put('/perfil', isAuthCliente, uploadPerfil, clientesController.updateMiPerfil);
 router.post('/cambiar-password', isAuthCliente, clientesController.cambiarPassword);
 
 router.get('/admin/todos', isAuthAdmin, clientesController.getAllClientes);
