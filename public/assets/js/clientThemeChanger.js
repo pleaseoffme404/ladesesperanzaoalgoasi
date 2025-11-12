@@ -1,15 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    const themeSwitcherButton = document.getElementById('client-theme-switcher');
+    const themeCheckbox = document.getElementById('client-theme-checkbox');
     const body = document.body;
     
-    if (!themeSwitcherButton) return;
+    if (!themeCheckbox) return;
 
     const applyTheme = (theme) => {
         if (theme === 'light') {
             body.classList.add('client-light-theme');
+            themeCheckbox.checked = true;
         } else {
             body.classList.remove('client-light-theme');
+            themeCheckbox.checked = false;
         }
     };
 
@@ -23,9 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
     
     applyTheme(currentTheme);
 
-    themeSwitcherButton.addEventListener('click', () => {
-        const isLight = body.classList.contains('client-light-theme');
-        const newTheme = isLight ? 'dark' : 'light';
+    themeCheckbox.addEventListener('change', () => {
+        const newTheme = themeCheckbox.checked ? 'light' : 'dark';
         localStorage.setItem('client_theme', newTheme);
         applyTheme(newTheme);
     });

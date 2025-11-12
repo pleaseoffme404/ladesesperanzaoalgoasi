@@ -19,6 +19,7 @@ CREATE TABLE clientes (
     email VARCHAR(100) UNIQUE NOT NULL,
     telefono VARCHAR(20),
     direccion VARCHAR(255),
+    imagen_perfil_url VARCHAR(255) DEFAULT '/assets/images/perfil/default-avatar.png',
     activo BOOLEAN DEFAULT TRUE
 );
 
@@ -73,6 +74,15 @@ CREATE TABLE detalle_pedidos (
     FOREIGN KEY (id_pedido) REFERENCES pedidos(id_pedido) ON DELETE CASCADE,
     FOREIGN KEY (id_producto) REFERENCES productos(id_producto),
     UNIQUE KEY uk_pedido_producto (id_pedido, id_producto)
+);
+
+CREATE TABLE favoritos (
+    id_favorito INT AUTO_INCREMENT PRIMARY KEY,
+    id_cliente INT NOT NULL,
+    id_producto INT NOT NULL,
+    FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente) ON DELETE CASCADE,
+    FOREIGN KEY (id_producto) REFERENCES productos(id_producto) ON DELETE CASCADE,
+    UNIQUE KEY uk_cliente_producto (id_cliente, id_producto)
 );
 
 INSERT INTO administradores (usuario, password, nombre_completo, email, activo) VALUES
