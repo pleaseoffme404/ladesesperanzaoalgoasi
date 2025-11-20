@@ -16,11 +16,47 @@ function slugify(text) {
 const getMiPerfil = async (req, res, next) => {
     const id_cliente = req.session.cliente.id_cliente;
     try {
-        const [rows] = await db.query('SELECT id_cliente, usuario, nombre, apellido, email, telefono, direccion, imagen_perfil_url FROM clientes WHERE id_cliente = ?', [id_cliente]);
+        const [rows] = await db.query('SELECT id_cliente, usuario, nombre, apellido, email, telefono, direccion, imagen_perfil_url, saldo FROM clientes WHERE id_cliente = ?', [id_cliente]);
         if (rows.length === 0) {
             return res.status(404).json({ success: false, message: 'Perfil no encontrado.' });
         }
         res.status(200).json({ success: true, data: rows[0] });
+    } catch (error) {
+        next(error);
+    }
+};
+const agregarFondos = async (req, res, next) => {
+    const id_cliente = req.session.cliente.id_cliente;
+    let { cantidad } = req.body;
+
+    cantidad = parseFloat(cantidad);
+    if (isNaN(cantidad)) {
+        return res.status(400).json({ success: false, message: 'La cantidad debe ser un número válido.' });
+    }
+
+    if (cantidad <= 0) {
+        return res.status(400).json({ success: false, message: 'La cantidad debe ser mayor a 0.' });
+    }
+
+    if (cantidad > 1000) {
+        return res.status(400).json({ success: false, message: 'Por seguridad, el máximo por transacción es de $1,000.00 MXN.' });
+    }
+
+    try {
+        const [rows] = await db.query('SELECT saldo FROM clientes WHERE id_cliente = ?', [id_cliente]);
+        if (rows.length === 0) return res.status(404).json({ message: 'Cliente no encontrado' });
+        
+        const saldoActual = parseFloat(rows[0].saldo);
+        const LIMITE_TOTAL = 9999999;
+
+        if ((saldoActual + cantidad) > LIMITE_TOTAL) {
+            return res.status(400).json({ success: false, message: 'La recarga excede el límite permitido en la cuenta.' });
+        }
+
+        await db.query('UPDATE clientes SET saldo = saldo + ? WHERE id_cliente = ?', [cantidad, id_cliente]);
+
+        res.status(200).json({ success: true, message: `Se han agregado $${cantidad.toFixed(2)} a tu cuenta.` });
+
     } catch (error) {
         next(error);
     }
@@ -203,5 +239,6 @@ module.exports = {
     getAllClientes,
     getClienteById,
     createClienteByAdmin,
-    updateClienteByAdmin
+    updateClienteByAdmin,
+    agregarFondos
 };

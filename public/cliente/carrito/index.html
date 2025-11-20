@@ -10,29 +10,33 @@
     <link rel="stylesheet" href="../../assets/css/clientFooter.css">
     <link rel="stylesheet" href="../../assets/css/clientCarrito.css">
     
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    
     <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        #map { height: 300px; width: 100%; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--client-bg-tertiary); z-index: 1; }
+        .address-box { margin-bottom: 20px; }
+        .address-box label { display: block; margin-bottom: 5px; font-weight: 600; color: var(--client-text-primary); }
+        .address-box input { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid var(--client-bg-tertiary); background: var(--client-bg-primary); color: var(--client-text-primary); box-sizing: border-box;}
+        .locate-btn {
+            background-color: var(--client-bg-tertiary);
+            border: none;
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            color: var(--client-text-primary);
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .locate-btn:hover { background-color: #d1d5db; }
+    </style>
 </head>
 <body>
 
     <header class="client-header">
-        <a href="/" class="header-logo">La Desesperanza</a>
-        <nav class="client-nav">
-            <a href="/">Inicio</a>
-            <a href="/tienda/">Tienda</a>
-            <a href="/cliente/" class="active" id="login-link">Mi Cuenta</a>
-            
-            <a href="/cliente/carrito/" class="cart-icon" id="cart-link">
-                <svg class="cart-icon-svg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.656-.414 1.243-1.067 1.243H4.51c-.653 0-1.137-.587-1.067-1.243L4.707 8.507c.072-.656.596-1.144 1.253-1.144h.211a.75.75 0 0 1 .75.75v.003a.75.75 0 0 1-.75.75H5.961l-.91 8.107h13.916l-.91-8.107h-.211a.75.75 0 0 1-.75-.75v-.003a.75.75 0 0 1 .75.75h.211c.657 0 1.18.487 1.253 1.144Z" />
-                </svg>
-                <span class="cart-badge" id="cart-badge">0</span>
-            </a>
-
-            <label class="switch" title="Cambiar Tema">
-                <input type="checkbox" id="client-theme-checkbox">
-                <span class="slider"></span>
-            </label>
-        </nav>
     </header>
 
     <main>
@@ -41,7 +45,7 @@
             
             <div id="checkout-success-message">
                 <h2>¡Gracias por tu compra!</h2>
-                <p>Tu pedido ha sido realizado exitosamente. Recibirás un correo de confirmación.</p>
+                <p>Tu pedido ha sido realizado exitosamente.</p>
                 <a href="/cliente/mis-pedidos/" class="cta-button" style="margin-top: 20px;">Ver mis pedidos</a>
             </div>
 
@@ -53,14 +57,25 @@
                 </div>
                 
                 <aside class="cart-summary" id="cart-summary-aside">
+                    <h2>Datos de Entrega</h2>
+                    
+                    <div class="address-box">
+                        <label>Ubicación (Pin del Mapa)</label>
+                        <button id="locate-me-btn" class="locate-btn">📍 Usar mi ubicación actual</button>
+                        <div id="map"></div>
+                        <small style="color: var(--client-text-secondary);">Coordenadas: <span id="lat-display">...</span>, <span id="lng-display">...</span></small>
+                    </div>
+
+                    <div class="address-box">
+                        <label for="direccion-texto">Dirección Completa</label>
+                        <input type="text" id="direccion-texto" placeholder="Calle, Número Ext/Int, Colonia, C.P.">
+                        <small style="color: var(--client-text-secondary); font-size: 0.8rem;">Ej: Av. Central #123, Depto 4, Col. Centro.</small>
+                    </div>
+
                     <h2>Resumen</h2>
                     <div class="summary-row">
                         <span>Subtotal:</span>
                         <span id="summary-subtotal">$0.00</span>
-                    </div>
-                    <div class="summary-row">
-                        <span>Envío:</span>
-                        <span>Gratis</span>
                     </div>
                     <div class="summary-row total">
                         <span>Total:</span>
@@ -77,9 +92,12 @@
     <footer class="client-footer-detailed">
     </footer>
 
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    
     <script src="../../assets/js/api.js"></script>
     <script src="../../assets/js/clientNav.js"></script>
     <script src="../../assets/js/clientThemeChanger.js"></script>
+    <script src="../../assets/js/validaciones.js"></script>
     <script src="../js/clientCarrito.js"></script>
 </body>
 </html>

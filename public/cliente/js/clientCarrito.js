@@ -8,8 +8,78 @@ document.addEventListener('DOMContentLoaded', () => {
     const successMessage = document.getElementById('checkout-success-message');
     const cartGrid = document.getElementById('cart-grid');
     const checkoutError = document.getElementById('checkout-error');
+    const direccionInput = document.getElementById('direccion-texto');
+    const latDisplay = document.getElementById('lat-display');
+    const lngDisplay = document.getElementById('lng-display');
+    const locateBtn = document.getElementById('locate-me-btn');
 
     let currentCart = [];
+    let map, marker;
+    let selectedLat = 19.4326; 
+    let selectedLng = -99.1332;
+
+    function initMap() {
+        if (map) return; 
+
+        map = L.map('map').setView([selectedLat, selectedLng], 13);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        marker = L.marker([selectedLat, selectedLng], {
+            draggable: true
+        }).addTo(map);
+
+        marker.on('dragend', function(event) {
+            const position = marker.getLatLng();
+            updatePosition(position.lat, position.lng);
+        });
+
+        map.on('click', function(e) {
+            marker.setLatLng(e.latlng);
+            updatePosition(e.latlng.lat, e.latlng.lng);
+        });
+
+        updatePosition(selectedLat, selectedLng);
+        
+        setTimeout(() => {
+            map.invalidateSize();
+            locateUser();
+        }, 500);
+    }
+
+    function locateUser() {
+        if (!navigator.geolocation) {
+            alert("Tu navegador no soporta geolocalización.");
+            return;
+        }
+
+        locateBtn.textContent = "📍 Buscando...";
+        
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const lat = position.coords.latitude;
+                const lng = position.coords.longitude;
+                
+                map.setView([lat, lng], 16);
+                marker.setLatLng([lat, lng]);
+                updatePosition(lat, lng);
+                locateBtn.textContent = "📍 Usar mi ubicación actual";
+            },
+            (error) => {
+                console.error("Error de geolocalización:", error);
+                locateBtn.textContent = "📍 Usar mi ubicación actual";
+            }
+        );
+    }
+
+    function updatePosition(lat, lng) {
+        selectedLat = lat;
+        selectedLng = lng;
+        latDisplay.textContent = lat.toFixed(5);
+        lngDisplay.textContent = lng.toFixed(5);
+    }
 
     async function loadCart() {
         try {
@@ -17,6 +87,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.success) {
                 currentCart = response.data;
                 renderCart();
+                if (currentCart.length > 0) {
+                    initMap(); 
+                }
             }
         } catch (error) {
             console.error('Error al cargar carrito:', error);
@@ -32,9 +105,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentCart.length === 0) {
             emptyMessage.style.display = 'block';
             checkoutButton.disabled = true;
+            if(document.getElementById('map')) document.getElementById('map').style.display = 'none';
         } else {
             emptyMessage.style.display = 'none';
             checkoutButton.disabled = false;
+            if(document.getElementById('map')) document.getElementById('map').style.display = 'block';
         }
 
         let subtotal = 0;
@@ -77,7 +152,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (response.success) {
                 currentCart = response.data;
                 renderCart();
-                updateHeaderCartBadge(response.data);
+                const cartBadge = document.getElementById('cart-badge');
+                if(cartBadge) {
+                    const totalItems = currentCart.reduce((sum, item) => sum + item.cantidad, 0);
+                    cartBadge.textContent = totalItems > 0 ? totalItems : 0;
+                    if(totalItems > 0) cartBadge.classList.add('visible');
+                    else cartBadge.classList.remove('visible');
+                }
             }
         } catch (error) {
             console.error('Error al eliminar:', error);
@@ -87,17 +168,36 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function handleCheckout() {
+        const direccion = direccionInput.value.trim();
+        
+        if (!direccion) {
+            checkoutError.textContent = 'Por favor, escribe la calle y número para facilitar la entrega.';
+            checkoutError.style.display = 'block';
+            direccionInput.focus();
+            return;
+        }
+
         checkoutButton.disabled = true;
         checkoutButton.textContent = 'Procesando...';
         checkoutError.style.display = 'none';
 
+        const payload = {
+            direccion_entrega: direccion,
+            latitud: selectedLat,
+            longitud: selectedLng
+        };
+
         try {
-            const response = await apiFetch('/api/pedidos/checkout', 'POST');
+            const response = await apiFetch('/api/pedidos/checkout', 'POST', payload);
             if (response.success) {
                 currentCart = [];
                 cartGrid.style.display = 'none';
                 successMessage.style.display = 'block';
-                updateHeaderCartBadge([]);
+                const cartBadge = document.getElementById('cart-badge');
+                if(cartBadge) {
+                    cartBadge.textContent = '0';
+                    cartBadge.classList.remove('visible');
+                }
             }
         } catch (error) {
             console.error('Error en checkout:', error);
@@ -107,19 +207,8 @@ document.addEventListener('DOMContentLoaded', () => {
             checkoutButton.textContent = 'Finalizar Compra';
         }
     }
-
-    function updateHeaderCartBadge(cart) {
-        const cartBadge = document.getElementById('cart-badge');
-        const totalItems = cart.reduce((sum, item) => sum + item.cantidad, 0);
-        if (totalItems > 0) {
-            cartBadge.textContent = totalItems;
-            cartBadge.classList.add('visible');
-        } else {
-            cartBadge.textContent = '0';
-            cartBadge.classList.remove('visible');
-        }
-    }
-
+    
+    locateBtn.addEventListener('click', locateUser);
     checkoutButton.addEventListener('click', handleCheckout);
 
     loadCart();

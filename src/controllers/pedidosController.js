@@ -78,9 +78,15 @@ const crearPedido = async (req, res, next) => {
     const email_cliente = req.session.cliente.email;
     const nombre_cliente = req.session.cliente.nombre;
     const carrito = req.session.cart;
+    
+    const { direccion_entrega, latitud, longitud } = req.body;
 
     if (!carrito || carrito.length === 0) {
         return res.status(400).json({ success: false, message: 'El carrito está vacío.' });
+    }
+    
+    if (!direccion_entrega) {
+        return res.status(400).json({ success: false, message: 'La dirección de entrega es requerida.' });
     }
 
     let connection;
@@ -110,23 +116,33 @@ const crearPedido = async (req, res, next) => {
                 error.statusCode = 400;
                 throw error;
             }
-            totalPedido += item.cantidad * producto.precio;
+            totalPedido += item.cantidad * parseFloat(producto.precio);
         }
 
+        const [clienteRow] = await connection.query('SELECT saldo FROM clientes WHERE id_cliente = ? FOR UPDATE', [id_cliente]);
+        const saldoActual = parseFloat(clienteRow[0].saldo);
+
+        if (saldoActual < totalPedido) {
+            const error = new Error(`Saldo insuficiente. Tienes $${saldoActual.toFixed(2)} y el pedido es de $${totalPedido.toFixed(2)}.`);
+            error.statusCode = 400;
+            throw error;
+        }
+
+        await connection.query('UPDATE clientes SET saldo = saldo - ? WHERE id_cliente = ?', [totalPedido, id_cliente]);
+
         const [resultPedido] = await connection.query(
-            'INSERT INTO pedidos (id_cliente, total, estado) VALUES (?, ?, ?)',
-            [id_cliente, totalPedido, 'Pendiente']
+            'INSERT INTO pedidos (id_cliente, total, estado, direccion_entrega, latitud, longitud) VALUES (?, ?, ?, ?, ?, ?)',
+            [id_cliente, totalPedido, 'Pendiente', direccion_entrega, latitud || 0, longitud || 0]
         );
         const id_pedido = resultPedido.insertId;
 
         const detalleQueries = [];
         const stockQueries = [];
-        
         let emailHtmlDetalle = '';
 
         for (const item of carrito) {
             const producto = productosMap.get(item.id_producto);
-            const subtotal = item.cantidad * producto.precio;
+            const subtotal = item.cantidad * parseFloat(producto.precio);
             
             detalleQueries.push(connection.query(
                 'INSERT INTO detalle_pedidos (id_pedido, id_producto, cantidad, precio_unitario, subtotal) VALUES (?, ?, ?, ?, ?)',
@@ -145,42 +161,21 @@ const crearPedido = async (req, res, next) => {
         await Promise.all(stockQueries);
 
         await connection.commit();
-        
         req.session.cart = [];
 
         const emailHtml = `
-            <p>¡Gracias por tu pedido, ${nombre_cliente}!</p>
-            <p>Hemos recibido tu pedido #${id_pedido} y lo estamos procesando.</p>
-            <h3>Resumen del Pedido</h3>
-            <table style="width:100%; border-collapse: collapse; text-align: left;">
-                <thead style="background-color: #f0ebe5;">
-                    <tr>
-                        <th style="padding: 10px;">Producto</th>
-                        <th style="padding: 10px;">Cantidad</th>
-                        <th style="padding: 10px;">Precio Unit.</th>
-                        <th style="padding: 10px;">Subtotal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${emailHtmlDetalle}
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="3" style="padding: 10px; text-align:right; font-weight: bold;">Total:</td>
-                        <td style="padding: 10px; font-weight: bold; font-size: 1.1em;">$${totalPedido.toFixed(2)}</td>
-                    </tr>
-                </tfoot>
+            <p>¡Gracias por tu compra!</p>
+            <p>Se han descontado <strong>$${totalPedido.toFixed(2)}</strong> de tu saldo.</p>
+            <p><strong>Dirección de Entrega:</strong> ${direccion_entrega}</p>
+            <hr>
+            <h3>Detalle del Pedido #${id_pedido}</h3>
+            <table style="width:100%; border-collapse: collapse;">
+                ${emailHtmlDetalle}
             </table>
-            <p>Recibirás una notificación cuando tu pedido sea enviado.</p>
         `;
-        
         await emailService.sendEmail(email_cliente, `Confirmación de Pedido #${id_pedido}`, emailHtml);
 
-        res.status(201).json({ 
-            success: true, 
-            message: 'Pedido creado exitosamente.',
-            id_pedido: id_pedido 
-        });
+        res.status(201).json({ success: true, message: 'Pedido pagado exitosamente.', id_pedido: id_pedido });
 
     } catch (error) {
         if (connection) await connection.rollback();

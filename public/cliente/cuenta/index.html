@@ -25,6 +25,7 @@
             <aside class="cuenta-nav">
                 <ul>
                     <li><button class="cuenta-tab active" data-view="view-perfil">Editar Perfil</button></li>
+                    <li><button class="cuenta-tab" data-view="view-fondos">Mi Cartera</button></li>
                     <li><button class="cuenta-tab" data-view="view-pedidos">Mis Pedidos</button></li>
                     <li><button class="cuenta-tab" data-view="view-favoritos">Mis Favoritos</button></li>
                 </ul>
@@ -45,7 +46,7 @@
 
                         <div class="form-grid">
                             <div class="form-group">
-                                <label for="usuario">Usuario (no se puede cambiar)</label>
+                                <label for="usuario">Usuario</label>
                                 <input type="text" id="usuario" disabled>
                             </div>
                             <div class="form-group">
@@ -92,6 +93,31 @@
                     </form>
                 </div>
 
+                <div id="view-fondos" class="cuenta-view">
+                    <h2>Mi Cartera</h2>
+                    <div class="welcome-card" style="text-align: center; margin-bottom: 30px;">
+                        <p style="font-size: 1.2rem;">Saldo Disponible</p>
+                        <h1 style="font-size: 3rem; color: var(--client-accent-primary); margin: 10px 0;">
+                            $<span id="saldo-display">0.00</span>
+                        </h1>
+                    </div>
+
+                    <div class="profile-form-container">
+                        <h3>Recargar Saldo</h3>
+                        <p style="font-size: 0.9rem; color: var(--client-text-secondary); margin-bottom: 20px;">
+                            Ingresa fondos a tu cuenta. Máximo $1,000.00 por transacción.
+                        </p>
+                        <form id="fondos-form">
+                            <div class="form-group">
+                                <label for="monto-recarga">Monto a recargar ($)</label>
+                                <input type="number" id="monto-recarga" step="0.01" placeholder="Ej. 500.00">
+                            </div>
+                            <p id="fondos-message" class="form-message"></p>
+                            <button type="submit" id="btn-recargar" class="profile-button">Recargar Ahora</button>
+                        </form>
+                    </div>
+                </div>
+
                 <div id="view-pedidos" class="cuenta-view">
                     <h2>Historial de Pedidos</h2>
                     <div id="orders-list-container">
@@ -102,6 +128,7 @@
                 <div id="view-favoritos" class="cuenta-view">
                     <h2>Mis Favoritos</h2>
                     <div id="favoritos-grid-container" class="product-grid">
+                    </div>
                     <p id="no-favoritos-message">No tienes productos favoritos.</p>
                 </div>
 
