@@ -20,6 +20,9 @@ CREATE TABLE clientes (
     telefono VARCHAR(20),
     saldo DECIMAL(15, 2) DEFAULT 0.00 NOT NULL,
     direccion VARCHAR(255),
+     direccion_entrega VARCHAR(255) NOT NULL,
+     latitud DECIMAL(10, 8),
+      longitud DECIMAL(11, 8),
     imagen_perfil_url VARCHAR(255) DEFAULT '/assets/images/perfil/default-avatar.png',
     activo BOOLEAN DEFAULT TRUE
 );
