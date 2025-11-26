@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 const fs = require('fs').promises;
 const path = require('path');
 const BCRYPT_SALT_ROUNDS = 10;
-
+const { validationResult } = require('express-validator');
 function slugify(text) {
     return text.toString().toLowerCase()
         .replace(/\s+/g, '-')
@@ -63,9 +63,20 @@ const agregarFondos = async (req, res, next) => {
 };
 
 const updateMiPerfil = async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        if (req.file) {
+            fs.unlink(req.file.path).catch(err => console.error("Error borrando tmp file:", err)); 
+            }
+        
+        return res.status(400).json({ 
+            success: false, 
+            message: errors.array()[0].msg 
+        });
+    }
     const id_cliente = req.session.cliente.id_cliente;
     const { nombre, apellido, email, telefono, direccion, imagen_perfil_url_actual } = req.body;
-
+    
     if (!nombre || !apellido || !email) {
         return res.status(400).json({ success: false, message: 'Campos requeridos faltantes: nombre, apellido, email.' });
     }

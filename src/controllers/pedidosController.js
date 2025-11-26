@@ -258,7 +258,14 @@ const getPedidoDetalle = async (req, res, next) => {
 
     try {
         const [pedidos] = await db.query(
-            'SELECT * FROM pedidos WHERE id_pedido = ? AND id_cliente = ?',
+            `SELECT 
+                p.*, 
+                c.nombre AS cliente_nombre, 
+                c.apellido AS cliente_apellido, 
+                c.email AS cliente_email
+             FROM pedidos p 
+             JOIN clientes c ON p.id_cliente = c.id_cliente 
+             WHERE p.id_pedido = ? AND p.id_cliente = ?`,
             [id, id_cliente]
         );
 

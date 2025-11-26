@@ -4,10 +4,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalPendientesEl = document.getElementById('total-pendientes-stat');
     const totalPedidosEl = document.getElementById('total-pedidos-stat');
     const totalClientesEl = document.getElementById('total-clientes-stat');
-    const totalProductosEl = document.getElementById('total-productos-stat');
     const recentOrdersList = document.getElementById('recent-orders-list');
     const lowStockList = document.getElementById('low-stock-list');
-    const recentClientsList = document.getElementById('recent-clients-list');
+
+    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.borderColor = '#334155';
 
     async function loadDashboardData() {
         try {
@@ -17,20 +18,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 apiFetch('/api/productos', 'GET')
             ]);
 
-            renderSummaryCards(pedidosData.data, clientesData.data, productosData.data);
-            renderRecentOrders(pedidosData.data);
-            renderLowStock(productosData.data);
-            renderRecentClients(clientesData.data);
+            const pedidos = pedidosData.data;
+            const clientes = clientesData.data;
+            const productos = productosData.data;
+
+            renderSummaryCards(pedidos, clientes);
+            
+            renderRecentOrders(pedidos);
+            renderLowStock(productos);
+
+            renderCharts(pedidos, productos);
 
         } catch (error) {
-            console.error("Error al cargar datos del dashboard:", error);
-            recentOrdersList.innerHTML = '<tr><td colspan="4">Error al cargar datos.</td></tr>';
-            lowStockList.innerHTML = '<li>Error al cargar datos.</li>';
+            console.error("Error al cargar datos:", error);
         }
     }
 
-    function renderSummaryCards(pedidos, clientes, productos) {
-        
+    function renderSummaryCards(pedidos, clientes) {
         const ingresos = pedidos
             .filter(p => p.estado === 'Completado')
             .reduce((sum, p) => sum + parseFloat(p.total), 0);
@@ -41,7 +45,6 @@ document.addEventListener('DOMContentLoaded', () => {
         totalPendientesEl.textContent = pendientes;
         totalPedidosEl.textContent = pedidos.length;
         totalClientesEl.textContent = clientes.length;
-        totalProductosEl.textContent = productos.filter(p => p.activo).length;
     }
 
     function renderRecentOrders(pedidos) {
@@ -50,18 +53,15 @@ document.addEventListener('DOMContentLoaded', () => {
             recentOrdersList.innerHTML = '<tr><td colspan="4">No hay pedidos recientes.</td></tr>';
             return;
         }
-
-        const recent = pedidos.slice(0, 5);
-
-        recent.forEach(order => {
+        pedidos.slice(0, 5).forEach(order => {
             const row = document.createElement('tr');
             const total = parseFloat(order.total).toFixed(2);
             const statusClass = order.estado.toLowerCase().replace(' ', '-');
             
             row.innerHTML = `
-                <td>#${order.id_pedido}</td>
+                <td><span style="font-family:monospace; color:var(--admin-text-main);">#${order.id_pedido}</span></td>
                 <td>${order.nombre} ${order.apellido}</td>
-                <td>$${total}</td>
+                <td><strong>$${total}</strong></td>
                 <td><span class="status-badge status-${statusClass}">${order.estado}</span></td>
             `;
             recentOrdersList.appendChild(row);
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const lowStockItems = productos.filter(p => p.activo && p.cantidad_disponible <= p.cantidad_minima);
 
         if (lowStockItems.length === 0) {
-            lowStockList.innerHTML = '<li>No hay productos con stock bajo.</li>';
+            lowStockList.innerHTML = '<li style="color:var(--admin-text-muted);">Todo el inventario está saludable.</li>';
             return;
         }
 
@@ -87,22 +87,68 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function renderRecentClients(clientes) {
-        recentClientsList.innerHTML = '';
-        if (clientes.length === 0) {
-            recentClientsList.innerHTML = '<li>No hay clientes registrados.</li>';
-            return;
-        }
+    function renderCharts(pedidos, productos) {
+        
+        const estados = {};
+        pedidos.forEach(p => {
+            estados[p.estado] = (estados[p.estado] || 0) + 1;
+        });
 
-        const recent = clientes.slice(-5).reverse();
+        const ctxOrders = document.getElementById('ordersChart').getContext('2d');
+        new Chart(ctxOrders, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(estados),
+                datasets: [{
+                    label: 'Cantidad de Pedidos',
+                    data: Object.values(estados),
+                    backgroundColor: [
+                        '#f59e0b', 
+                        '#3b82f6', 
+                        '#10b981', 
+                        '#ef4444'  
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right' }
+                }
+            }
+        });
 
-        recent.forEach(client => {
-            const li = document.createElement('li');
-            li.innerHTML = `
-                <span>${client.nombre} ${client.apellido}</span>
-                <span class="stock-ok">${client.email}</span>
-            `;
-            recentClientsList.appendChild(li);
+
+        const topStock = productos
+            .sort((a, b) => b.cantidad_disponible - a.cantidad_disponible)
+            .slice(0, 5);
+
+        const ctxStock = document.getElementById('stockChart').getContext('2d');
+        new Chart(ctxStock, {
+            type: 'bar',
+            data: {
+                labels: topStock.map(p => p.nombre.substring(0, 10) + '...'), 
+                datasets: [{
+                    label: 'Unidades en Stock',
+                    data: topStock.map(p => p.cantidad_disponible),
+                    backgroundColor: '#3b82f6',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#334155' } },
+                    x: { grid: { display: false } }
+                }
+            }
         });
     }
 

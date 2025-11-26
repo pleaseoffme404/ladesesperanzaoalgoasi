@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | La Desesperanza</title>
     
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
     <link rel="stylesheet" href="../../assets/css/adminStyles.css">
     <link rel="stylesheet" href="../../assets/css/adminHeader.css">
 </head>
@@ -12,21 +14,20 @@
 
     <header class="admin-header">
         <div class="header-left">
-            <h1 class="header-title">La Desesperanza - Admin</h1>
+            <h1 class="header-title">La Desesperanza Admin</h1>
         </div>
-        
         <nav class="header-nav">
             <a href="/admin/dashboard/" class="active">Dashboard</a>
             <a href="/admin/productos/">Productos</a>
             <a href="/admin/pedidos/">Pedidos</a>
             <a href="/admin/clientes/">Clientes</a>
         </nav>
-
         <div class="header-right">
             <div id="admin-user-menu">
-                <p>Bienvenido, <strong id="admin-username-placeholder">Cargando...</strong></p>
+                <p><strong id="admin-username-placeholder">Admin</strong></p>
             </div>
-            <button id="admin-logout-button">Cerrar Sesión</button>
+            <button id="admin-logout-button" style="background:none; border:none; color:var(--admin-text-muted); cursor:pointer;">Salir</button>
+            
             <label class="switch" title="Cambiar Tema">
                 <input type="checkbox" id="admin-theme-checkbox">
                 <span class="slider"></span>
@@ -37,31 +38,48 @@
     <main class="dashboard-grid">
         <div class="summary-cards">
             <div class="summary-card">
-                <p>Ingresos Totales (Completado)</p>
-                <h2 id="total-ingresos-stat" class="stat-number">-</h2>
+                <p>Ingresos (Neto)</p>
+                <h2 id="total-ingresos-stat" class="stat-number" style="color: #10b981;">-</h2>
             </div>
             <div class="summary-card">
-                <p>Pedidos Pendientes</p>
-                <h2 id="total-pendientes-stat" class="stat-number">-</h2>
+                <p>Por Atender</p>
+                <h2 id="total-pendientes-stat" class="stat-number" style="color: #f59e0b;">-</h2>
             </div>
             <div class="summary-card">
-                <p>Pedidos Totales</p>
+                <p>Total Pedidos</p>
                 <h2 id="total-pedidos-stat" class="stat-number">-</h2>
             </div>
             <div class="summary-card">
-                <p>Clientes Registrados</p>
+                <p>Clientes</p>
                 <h2 id="total-clientes-stat" class="stat-number">-</h2>
-            </div>
-            <div class="summary-card">
-                <p>Productos Activos</p>
-                <h2 id="total-productos-stat" class="stat-number">-</h2>
             </div>
         </div>
 
-        <div class="dashboard-section">
-            <h3>Pedidos Recientes</h3>
+        <div class="dashboard-section section-charts">
+            <h3>Estado de los Pedidos</h3>
+            <div style="position: relative; height: 300px; width: 100%;">
+                <canvas id="ordersChart"></canvas>
+            </div>
+        </div>
+
+        <div class="dashboard-section section-side">
+            <h3>Top Productos (Stock)</h3>
+            <div style="position: relative; height: 200px; width: 100%;">
+                <canvas id="stockChart"></canvas>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <h3>Alerta Stock Bajo</h3>
+                <ul id="low-stock-list" class="dashboard-list">
+                    <li>Cargando...</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="dashboard-section" style="grid-column: span 12;">
+            <h3>Últimos Pedidos</h3>
             <div class="table-container">
-                <table style="margin-top: 0;">
+                <table>
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -76,27 +94,13 @@
                 </table>
             </div>
         </div>
-
-        <div class="dashboard-section">
-            <h3>Alerta de Stock Bajo</h3>
-            <ul id="low-stock-list" class="dashboard-list">
-                <li>Cargando...</li>
-            </ul>
-        </div>
-        
-        <div class="dashboard-section">
-            <h3>Clientes Nuevos</h3>
-            <ul id="recent-clients-list" class="dashboard-list">
-                <li>Cargando...</li>
-            </ul>
-        </div>
     </main>
 
     <footer class="admin-footer">
-        <p>&copy; La Desesperanza 2025</p>
+        <p>&copy; La Desesperanza 2025 - Panel de Administración</p>
     </footer>
 
-    <script src="../../assets/js/api.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <script src="../../assets/js/api.js"></script>
     <script src="../js/adminThemeChanger.js"></script>
     <script src="../js/adminDashboard.js"></script>
     <script src="../js/adminDashboardLogic.js"></script>

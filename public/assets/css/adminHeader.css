@@ -1,16 +1,25 @@
-
 .admin-header {
     width: 100%;
-    padding: 10px 3%;
+    padding: 15px 5%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: var(--admin-bg-secondary);
-    border-bottom: 1px solid var(--admin-bg-tertiary);
+    background-color: var(--admin-bg-card); 
+    border-bottom: 1px solid var(--admin-border);
     position: sticky;
     top: 0;
     z-index: 100;
     box-sizing: border-box;
+    box-shadow: var(--admin-shadow);
+}
+
+.header-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    background: var(--admin-gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent; 
+    margin: 0;
 }
 
 .header-left {
@@ -19,12 +28,7 @@
     gap: 15px;
 }
 
-.header-title {
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--admin-text-primary);
-    margin: 0;
-}
+
 
 .header-nav {
     display: flex;
@@ -114,6 +118,7 @@ body:not(.admin-light-theme) .theme-icon {
     border: 2px solid var(--admin-bg-tertiary);
     border-radius: 50px;
     transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    width: 3.2em;
   }
   
   .slider:before {
