@@ -5,7 +5,7 @@
     text-align: center;
     padding: 60px 20px;
     background-color: var(--client-bg-tertiary);
-    background-image: url('../images/hero-image.jpg');
+    background-image: url('../images/hero-image.webp');
     background-size: cover;
     background-position: center;
     min-height: 400px;

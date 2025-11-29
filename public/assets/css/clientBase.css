@@ -1,22 +1,28 @@
 :root {
-    --client-bg-primary: #1F2937;
-    --client-bg-secondary: #374151;
-    --client-bg-tertiary: #4B5563;
-    --client-text-primary: #F3F4F6;
-    --client-text-secondary: #9CA3AF;
-    --client-accent-primary: #E67E22;
-    --client-accent-secondary: #F39C12;
+    --client-bg-primary: #0F172A; 
+    --client-bg-secondary: #162B1D; 
+    --client-bg-tertiary: #2D4030; 
+    
+    --client-text-primary: #F1F5F9;
+    --client-text-secondary: #CBD5E1; 
+    
+    --client-accent-primary: #D42426; 
+    --client-accent-secondary: #1E5935; 
+    --client-accent-gold: #FFD700;
+    
     --client-font-family: 'Lato', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 body.client-light-theme {
-    --client-bg-primary: #fdfcf7;
-    --client-bg-secondary: #ffffff;
-    --client-bg-tertiary: #f0ebe5;
-    --client-text-primary: #3a3a3a;
-    --client-text-secondary: #5c5c5c;
-    --client-accent-primary: #D35400;
-    --client-accent-secondary: #A0522D;
+    --client-bg-primary: #FFFFFF; 
+    --client-bg-secondary: #F8F9FA; 
+    --client-bg-tertiary: #E2E8F0; 
+    
+    --client-text-primary: #162B1D; 
+    --client-text-secondary: #475569; 
+    
+    --client-accent-primary: #C41E3A; 
+    --client-accent-secondary: #2E8B57;
 }
 
 body {

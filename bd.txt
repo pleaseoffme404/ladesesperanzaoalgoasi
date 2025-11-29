@@ -114,3 +114,26 @@ VALUES
 ('Dona Glaseada', 'Dona clásica frita y cubierta de un moho tan verde que cuenta como vegetal.', 16.50, @cat_postres, 60, 12, FALSE, NULL, '/assets/images/panes/dona.png', @id_admin, TRUE);
 
 SELECT id_producto, nombre, id_categoria FROM productos WHERE nombre IN ('Bolillo Artesanal', 'Concha Tradicional', 'Dona Glaseada');
+
+
+USE panaderia_desesperanza;
+
+
+UPDATE productos SET imagen_url = '/assets/images/panes/bolillo.webp' WHERE nombre LIKE '%Bolillo%';
+
+INSERT INTO productos 
+(nombre, descripcion, precio, id_categoria, cantidad_disponible, cantidad_minima, es_temporada, temporada, imagen_url, creado_por, activo) 
+VALUES 
+('Cuernito de Mantequilla', 'Croissant clásico, hojaldrado y lleno de mantequilla.', 12.00, @cat_dulces, 60, 10, FALSE, NULL, '/assets/images/panes/cuernito.jpg', @id_admin, TRUE),
+
+('Concha Santa Claus', 'Nuestra concha tradicional con decorado especial de Navidad.', 22.00, @cat_dulces, 100, 20, TRUE, 'Navidad', '/assets/images/panes/xmas-concha.jpg', @id_admin, TRUE),
+
+('Croissant Festivo', 'Relleno de crema pastelera y decorado con colores navideños.', 25.00, @cat_dulces, 40, 10, TRUE, 'Navidad', '/assets/images/panes/xmas-croissant.jpg', @id_admin, TRUE),
+
+('Dona Reno', 'Dona cubierta de chocolate con decoración de reno.', 20.00, @cat_postres, 80, 15, TRUE, 'Navidad', '/assets/images/panes/xmas-donut.jpg', @id_admin, TRUE),
+
+('Muffin de Arándanos', 'Muffin especial de temporada con arándanos y escarcha de azúcar.', 28.00, @cat_postres, 50, 10, TRUE, 'Navidad', '/assets/images/panes/xmas-muffin.jpg', @id_admin, TRUE),
+
+('Galleta Jengibre', 'Clásica galleta de jengibre decorada a mano.', 15.00, @cat_postres, 150, 30, TRUE, 'Navidad', '/assets/images/panes/xmas.cookie.jpg', @id_admin, TRUE);
+
+SELECT id_producto, nombre, imagen_url, es_temporada FROM productos WHERE creado_por = @id_admin;
