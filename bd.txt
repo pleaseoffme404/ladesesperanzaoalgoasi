@@ -107,16 +107,11 @@ SET @cat_postres = (SELECT id_categoria FROM categorias WHERE nombre = 'Postres'
 INSERT INTO productos 
 (nombre, descripcion, precio, id_categoria, cantidad_disponible, cantidad_minima, es_temporada, temporada, imagen_url, creado_por, activo) 
 VALUES 
-('Bolillo Artesanal', 'El clásico bolillo crujiente por fuera e indestructible por dentro, horneado el día del nacimiento de cristo.', 5.00, @cat_salados, 200, 50, FALSE, NULL, '/assets/images/panes/bolillo.jpg', @id_admin, TRUE),
-
-('Concha Tradicional', 'correoso pan dulce con la clásica cubierta de moho.', 18.00, @cat_dulces, 80, 15, FALSE, NULL, '/assets/images/panes/concha.png', @id_admin, TRUE),
-
-('Dona Glaseada', 'Dona clásica frita y cubierta de un moho tan verde que cuenta como vegetal.', 16.50, @cat_postres, 60, 12, FALSE, NULL, '/assets/images/panes/dona.png', @id_admin, TRUE);
-
-SELECT id_producto, nombre, id_categoria FROM productos WHERE nombre IN ('Bolillo Artesanal', 'Concha Tradicional', 'Dona Glaseada');
+('Bolillo Artesanal', 'El clásico bolillo crujiente por fuera e indestructible por dentro, horneado el día del nacimiento de cristo.', 5.00, @cat_salados, 200, 50, FALSE, NULL, '/assets/images/panes/bolillo.jpg', @id_admin, TRUE);
 
 
-USE panaderia_desesperanza;
+SELECT id_producto, nombre, id_categoria FROM productos WHERE nombre IN ('Bolillo Artesanal' );
+
 
 
 UPDATE productos SET imagen_url = '/assets/images/panes/bolillo.webp' WHERE nombre LIKE '%Bolillo%';
